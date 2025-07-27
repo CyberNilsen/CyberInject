@@ -209,9 +209,9 @@ The developers assume no liability for misuse of this tool.
 
 ## 📞 Support
 
-- 🐛 [Report Issues](https://github.com/yourusername/cyberinject/issues)
-- 💡 [Feature Requests](https://github.com/yourusername/cyberinject/issues)
-- 📖 [Documentation](https://github.com/yourusername/cyberinject/wiki)
+- 🐛 [Report Issues](https://github.com/CyberNilsen/CyberInject/issues)
+- 💡 [Feature Requests](https://github.com/CyberNilsen/CyberInject/issues)
+- 📖 [Documentation](https://github.com/CyberNilsen/CyberInject/wiki)
 
 ---
 
