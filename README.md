@@ -4,7 +4,7 @@
 
 A comprehensive browser extension designed for authorized security testing and penetration testing activities. CyberInject provides quick access to common security payloads across multiple vulnerability categories.
 
-<img width="1024" height="1024" alt="CyberInject" src="https://github.com/user-attachments/assets/adad6f04-79ef-4cb9-be85-3680e2f0963a" />
+<img width="1024" height="554" alt="CyberInjectReduced" src="https://github.com/user-attachments/assets/190327a4-efeb-4b86-93d3-65d7ba40f3ba" />
 
 ![Version](https://img.shields.io/badge/version-1.0.0-red)
 ![License](https://img.shields.io/badge/license-MIT-blue)
