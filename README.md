@@ -6,7 +6,7 @@ A comprehensive browser extension designed for authorized security testing and p
 
 <img width="1024" height="554" alt="CyberInjectReduced" src="https://github.com/user-attachments/assets/190327a4-efeb-4b86-93d3-65d7ba40f3ba" />
 
-![Version](https://img.shields.io/badge/version-1.0.0-red)
+![Version](https://img.shields.io/badge/version-1.0.1-red)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Security](https://img.shields.io/badge/use-authorized%20only-orange)
 [![Chrome Web Store](https://img.shields.io/badge/Chrome%20Web%20Store-Available-brightgreen)](https://chromewebstore.google.com/detail/cyberinject/dgnnpllamcglhcfmppgijeindohkkabm)
