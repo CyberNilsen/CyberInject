@@ -76,7 +76,7 @@ A comprehensive browser extension designed for authorized security testing and p
 
 **🚀 Get CyberInject instantly from the Chrome Web Store:**
 
-[![Install from Chrome Web Store](https://storage.googleapis.com/web-dev-uploads/image/WlD8wC6g8khYWPJUsQceQkhXSlv1/HRs9MPufa1J1h5glNhut.png)](https://chromewebstore.google.com/detail/cyberinject/dgnnpllamcglhcfmppgijeindohkkabm)
+Install from Chrome Web Store
 
 1. Visit the [CyberInject Chrome Web Store page](https://chromewebstore.google.com/detail/cyberinject/dgnnpllamcglhcfmppgijeindohkkabm)
 2. Click "Add to Chrome"
