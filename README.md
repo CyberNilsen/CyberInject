@@ -171,14 +171,6 @@ cyberinject/
 - Minimal permissions required
 - Chrome Web Store security reviewed
 
-## 📊 Extension Stats
-
-- **Version:** 1.0.0
-- **Size:** 3.31 MiB
-- **Last Updated:** July 28, 2025
-- **Languages:** English (United States)
-- **Privacy:** No data collection or third-party sharing
-
 ## 🎨 Customization
 
 ### Adding New Payloads
