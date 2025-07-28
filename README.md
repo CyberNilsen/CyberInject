@@ -9,6 +9,7 @@ A comprehensive browser extension designed for authorized security testing and p
 ![Version](https://img.shields.io/badge/version-1.0.0-red)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Security](https://img.shields.io/badge/use-authorized%20only-orange)
+[![Chrome Web Store](https://img.shields.io/badge/Chrome%20Web%20Store-Available-brightgreen)](https://chromewebstore.google.com/detail/cyberinject/dgnnpllamcglhcfmppgijeindohkkabm)
 
 ## ⚠️ Important Disclaimer
 
@@ -71,11 +72,28 @@ A comprehensive browser extension designed for authorized security testing and p
 
 ## 🛠️ Installation
 
-### From Source
+### Quick Install - Chrome Web Store
+
+**🚀 Get CyberInject instantly from the Chrome Web Store:**
+
+Install from Chrome Web Store
+
+1. Visit the [CyberInject Chrome Web Store page](https://chromewebstore.google.com/detail/cyberinject/dgnnpllamcglhcfmppgijeindohkkabm)
+2. Click "Add to Chrome"
+3. Confirm the installation
+4. Look for the CyberInject icon in your browser toolbar
+
+**Compatible with:**
+- Google Chrome
+- Microsoft Edge
+- Brave Browser
+- Any Chromium-based browser
+
+### From Source (Advanced Users)
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/cyberinject.git
+git clone https://github.com/CyberNilsen/CyberInject.git
 cd cyberinject
 ```
 
@@ -139,9 +157,10 @@ cyberinject/
 
 ### Browser Compatibility
 
-- ✅ Chrome/Chromium
-- ✅ Microsoft Edge
-- ✅ Firefox
+- ✅ Chrome/Chromium (via Chrome Web Store)
+- ✅ Microsoft Edge (via Chrome Web Store)
+- ✅ Brave Browser (via Chrome Web Store)
+- ✅ Firefox (manual installation)
 - ✅ Safari (with manifest adjustments)
 
 ### Security Features
@@ -150,6 +169,7 @@ cyberinject/
 - Local clipboard access only
 - No data persistence or tracking
 - Minimal permissions required
+- Chrome Web Store security reviewed
 
 ## 🎨 Customization
 
@@ -192,6 +212,15 @@ cyberinject/
 - Follow existing code style and structure
 - Update documentation as needed
 
+## ⭐ Support the Project
+
+If you find CyberInject useful for your security testing work:
+
+- ⭐ **Star this repository** on GitHub
+- 📝 **Rate and review** on the [Chrome Web Store](https://chromewebstore.google.com/detail/cyberinject/dgnnpllamcglhcfmppgijeindohkkabm)
+- 🐛 **Report issues** to help improve the tool
+- 🚀 **Share with fellow security researchers**
+
 ## 📄 License
 
 This project is licensed under the [MIT License](LICENSE).
@@ -207,12 +236,16 @@ This tool is intended solely for authorized security testing and educational pur
 
 The developers assume no liability for misuse of this tool.
 
-## 📞 Support
+## 📞 Support & Links
 
-- 🐛 [Report Issues](https://github.com/CyberNilsen/CyberInject/issues)
-- 💡 [Feature Requests](https://github.com/CyberNilsen/CyberInject/issues)
-- 📖 [Documentation](https://github.com/CyberNilsen/CyberInject/wiki)
+- 🛒 **Chrome Web Store:** [Install CyberInject](https://chromewebstore.google.com/detail/cyberinject/dgnnpllamcglhcfmppgijeindohkkabm)
+- 🐛 **Report Issues:** [GitHub Issues](https://github.com/CyberNilsen/CyberInject/issues)
+- 💡 **Feature Requests:** [GitHub Issues](https://github.com/CyberNilsen/CyberInject/issues)
+- 📖 **Documentation:** [GitHub Wiki](https://github.com/CyberNilsen/CyberInject/wiki)
+- 📧 **Contact:** cyberbrothershq@gmail.com
 
 ---
 
 **Remember: With great power comes great responsibility. Use CyberInject ethically and legally.**
+
+*Available now on the Chrome Web Store - Get instant access to professional security testing payloads!*
