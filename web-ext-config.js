@@ -18,11 +18,11 @@ module.exports = {
     }
   },
   
-  sign: {
+  //sign: {
     // Add your API credentials when ready for AMO
     // apiKey: 'your-jwt-issuer',
     // apiSecret: 'your-jwt-secret'
-  },
+  //},
   
   lint: {
     pretty: true,
