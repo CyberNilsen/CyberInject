@@ -24,7 +24,7 @@ A comprehensive browser extension designed for authorized security testing and p
 
 ### Vulnerability Categories
 
-- **XSS (Cross-Site Scripting)** - 6 payloads
+- **XSS (Cross-Site Scripting)** - 15 payloads
   - Basic script alerts
   - Image error handlers
   - SVG-based injections
@@ -32,7 +32,7 @@ A comprehensive browser extension designed for authorized security testing and p
   - Iframe exploits
   - Encoded string bypasses
 
-- **SQL Injection** - 6 payloads
+- **SQL Injection** - 15 payloads
   - Authentication bypasses
   - Union-based injections
   - Comment-based bypasses
@@ -40,21 +40,21 @@ A comprehensive browser extension designed for authorized security testing and p
   - Table enumeration
   - Error-based techniques
 
-- **SSRF (Server-Side Request Forgery)** - 5 payloads
+- **SSRF (Server-Side Request Forgery)** - 12 payloads
   - Localhost access attempts
   - Internal service targeting
   - Cloud metadata endpoints
   - File protocol exploitation
   - Network interface probing
 
-- **LFI (Local File Inclusion)** - 5 payloads
+- **LFI (Local File Inclusion)** - 12 payloads
   - Path traversal attacks
   - System file access
   - Process environment disclosure
   - Platform-specific targets
   - PHP filter exploitation
 
-- **Other Vulnerabilities** - 5 payloads
+- **Other Vulnerabilities** - 15 payloads
   - Template injection
   - Command injection
   - Open redirects
