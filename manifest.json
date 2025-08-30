@@ -28,9 +28,9 @@
   
   "content_security_policy": "script-src 'self'; object-src 'self'",
   
-  "applications": {
+  "browser_specific_settings": {
     "gecko": {
-      "id": "andreasnilsen07@hotmail.com",
+      "id": "cyberbrothershq@gmail.com",
       "strict_min_version": "109.0"
     }
   }
