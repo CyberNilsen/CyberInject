@@ -1,15 +1,17 @@
 {
-  "manifest_version": 3,
+  "manifest_version": 2,
   "name": "CyberInject",
   "version": "1.1.1",
   "description": "Professional security testing toolkit for ethical hackers and penetration testers",
+  
   "icons": {
     "16": "icons/16.png",
     "32": "icons/32.png",
     "48": "icons/48.png",
     "128": "icons/128.png"
   },
-  "action": {
+  
+  "browser_action": {
     "default_popup": "popup.html",
     "default_title": "CyberInject - Security Testing Toolkit",
     "default_icon": {
@@ -19,10 +21,17 @@
       "128": "icons/128.png"
     }
   },
+  
   "permissions": [
     "clipboardWrite"
   ],
-  "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'"
+  
+  "content_security_policy": "script-src 'self'; object-src 'self'",
+  
+  "applications": {
+    "gecko": {
+      "id": "andreasnilsen07@hotmail.com",
+      "strict_min_version": "57.0"
+    }
   }
 }

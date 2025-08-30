@@ -1,4 +1,3 @@
-
 class CyberInject {
   constructor() {
     this.init();
@@ -10,7 +9,6 @@ class CyberInject {
     this.setupKeyboardShortcuts();
     this.updatePayloadCounts();
   }
-
 
   setupTabNavigation() {
     const tabButtons = document.querySelectorAll('.tab-button');
@@ -81,9 +79,10 @@ class CyberInject {
     });
   }
 
-
+  // Firefox-compatible clipboard method
   async copyToClipboard(text) {
     try {
+      // Try modern Clipboard API first (Firefox 63+)
       if (navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(text);
         return;
@@ -92,9 +91,40 @@ class CyberInject {
       console.warn('Clipboard API failed, using fallback:', error);
     }
 
+    // Firefox-specific fallback using browser API
+    try {
+      if (typeof browser !== 'undefined' && browser.tabs) {
+        // Use Firefox extension API if available
+        await this.firefoxClipboardFallback(text);
+        return;
+      }
+    } catch (error) {
+      console.warn('Firefox API failed, using document fallback:', error);
+    }
+
+    // Final fallback using document.execCommand
     return this.fallbackCopyToClipboard(text);
   }
 
+  // Firefox-specific clipboard method
+  async firefoxClipboardFallback(text) {
+    if (typeof browser !== 'undefined' && browser.tabs) {
+      // Execute content script to copy text
+      const code = `
+        const textarea = document.createElement('textarea');
+        textarea.value = ${JSON.stringify(text)};
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      `;
+      
+      const tabs = await browser.tabs.query({active: true, currentWindow: true});
+      if (tabs.length > 0) {
+        await browser.tabs.executeScript(tabs[0].id, {code: code});
+      }
+    }
+  }
 
   fallbackCopyToClipboard(text) {
     return new Promise((resolve, reject) => {
@@ -139,7 +169,6 @@ class CyberInject {
     }, 2000);
   }
 
-
   showCopyError(card, copyButton) {
     card.style.borderColor = '#ef4444';
     copyButton.textContent = '❌';
@@ -152,9 +181,7 @@ class CyberInject {
     }, 2000);
   }
 
-
   showTemporaryMessage(message, type = 'info') {
-
     const existingMessages = document.querySelectorAll('.temp-message');
     existingMessages.forEach(msg => msg.remove());
 
@@ -186,10 +213,8 @@ class CyberInject {
     }, 3000);
   }
 
-
   setupKeyboardShortcuts() {
     document.addEventListener('keydown', (e) => {
-
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
         return;
       }
@@ -244,6 +269,7 @@ class CyberInject {
   }
 }
 
+// CSS animations
 const style = document.createElement('style');
 style.textContent = `
   @keyframes slideInRight {
@@ -271,7 +297,7 @@ style.textContent = `
 document.head.appendChild(style);
 
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🛡️ CyberInject Security Testing Toolkit Loaded');
+  console.log('🛡️ CyberInject Security Testing Toolkit Loaded (Firefox)');
   
   const cyberInject = new CyberInject();
   
@@ -281,12 +307,21 @@ document.addEventListener('DOMContentLoaded', () => {
   window.cyberInject = cyberInject;
 });
 
-if (typeof chrome !== 'undefined' && chrome.runtime) {
-  chrome.runtime.onSuspend.addListener(() => {
-    console.log('🔄 CyberInject extension suspending');
+// Firefox extension lifecycle
+if (typeof browser !== 'undefined' && browser.runtime) {
+  browser.runtime.onSuspend?.addListener(() => {
+    console.log('🔄 CyberInject extension suspending (Firefox)');
   });
 }
 
+// Chrome compatibility fallback
+if (typeof chrome !== 'undefined' && chrome.runtime) {
+  chrome.runtime.onSuspend?.addListener(() => {
+    console.log('🔄 CyberInject extension suspending (Chrome)');
+  });
+}
+
+// Export for testing
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = CyberInject;
 }
