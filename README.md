@@ -83,9 +83,19 @@ Install from Chrome Web Store
 3. Confirm the installation
 4. Look for the CyberInject icon in your browser toolbar
 
+**Quick Install - Firefox Add-ons**
+
+🦊 Get CyberInject instantly from Firefox Add-ons:
+
+1. Visit the CyberInject Firefox Add-ons page
+2. Click "Add to Firefox"
+3. Confirm the installation
+4. Look for the CyberInject icon in your browser toolbar
+
 **Compatible with:**
 - Google Chrome
 - Microsoft Edge
+- Firefox
 - Brave Browser
 - Any Chromium-based browser
 
