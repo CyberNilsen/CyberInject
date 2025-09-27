@@ -25,19 +25,21 @@ class CyberInject {
       }
 
       .settings-button {
-        background: rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.15);
         border: none;
         padding: 8px;
         border-radius: 6px;
         cursor: pointer;
         color: white;
         font-size: 16px;
-        transition: all 0.2s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(4px);
       }
 
       .settings-button:hover {
-        background: rgba(255, 255, 255, 0.3);
-        transform: rotate(90deg);
+        background: rgba(255, 255, 255, 0.25);
+        transform: rotate(180deg) scale(1.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       }
 
       /* Settings Modal */
@@ -47,25 +49,37 @@ class CyberInject {
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(0, 0, 0, 0.8);
+        background: rgba(15, 23, 42, 0.8);
         display: none;
         align-items: center;
         justify-content: center;
         z-index: 1000;
+        backdrop-filter: blur(8px);
+        opacity: 0;
+        transition: opacity 0.3s ease;
       }
 
       .settings-modal.active {
         display: flex;
+        opacity: 1;
       }
 
       .settings-content {
-        background: #2d2d44;
+        background: #ffffff;
         border-radius: 12px;
         padding: 24px;
-        width: 380px;
-        max-height: 500px;
+        width: 90vw;
+        max-width: 500px;
+        max-height: 80vh;
         overflow-y: auto;
-        border: 1px solid #404052;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        transform: scale(0.95);
+        transition: transform 0.3s ease;
+      }
+
+      .settings-modal.active .settings-content {
+        transform: scale(1);
       }
 
       .settings-header {
@@ -73,25 +87,30 @@ class CyberInject {
         align-items: center;
         justify-content: space-between;
         margin-bottom: 20px;
+        border-bottom: 2px solid #dc2626;
+        padding-bottom: 12px;
       }
 
       .settings-title {
         font-size: 18px;
         font-weight: 700;
-        color: #e2e8f0;
+        color: #0f172a;
       }
 
       .close-button {
         background: none;
         border: none;
-        color: #94a3b8;
+        color: #64748b;
         font-size: 20px;
         cursor: pointer;
         padding: 4px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
       }
 
       .close-button:hover {
-        color: #e2e8f0;
+        color: #dc2626;
+        background: #fef2f2;
       }
 
       .form-group {
@@ -102,25 +121,27 @@ class CyberInject {
         display: block;
         font-size: 12px;
         font-weight: 600;
-        color: #e2e8f0;
+        color: #0f172a;
         margin-bottom: 6px;
       }
 
       .form-input, .form-select, .form-textarea {
         width: 100%;
-        background: #363650;
-        border: 1px solid #404052;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
         border-radius: 6px;
         padding: 10px 12px;
-        color: #e2e8f0;
+        color: #0f172a;
         font-size: 13px;
         box-sizing: border-box;
+        transition: all 0.2s ease;
       }
 
       .form-input:focus, .form-select:focus, .form-textarea:focus {
         outline: none;
-        border-color: #6366f1;
-        background: #404060;
+        border-color: #dc2626;
+        background: #ffffff;
+        box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
       }
 
       .form-textarea {
@@ -146,21 +167,26 @@ class CyberInject {
       }
 
       .btn-primary {
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        background: #dc2626;
         color: white;
+        border: none;
       }
 
       .btn-primary:hover {
+        background: #b91c1c;
         transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
       }
 
       .btn-secondary {
-        background: #404052;
-        color: #e2e8f0;
+        background: #f8fafc;
+        color: #475569;
+        border: 1px solid #e2e8f0;
       }
 
       .btn-secondary:hover {
-        background: #4a4a5e;
+        background: #f1f5f9;
+        border-color: #cbd5e1;
       }
 
       .custom-payloads-list {
@@ -168,53 +194,60 @@ class CyberInject {
       }
 
       .custom-payload-item {
-        background: #363650;
-        border: 1px solid #10b981;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
         border-radius: 6px;
-        padding: 10px;
+        padding: 12px;
         margin-bottom: 8px;
         position: relative;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        border-left: 3px solid #dc2626;
       }
 
       .custom-payload-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 4px;
+        margin-bottom: 8px;
       }
 
       .custom-payload-name {
         font-size: 12px;
         font-weight: 600;
-        color: #e2e8f0;
+        color: #0f172a;
       }
 
       .delete-button {
-        background: #ef4444;
+        background: #dc2626;
         border: none;
         color: white;
-        padding: 2px 6px;
+        padding: 4px 8px;
         border-radius: 4px;
         font-size: 10px;
         cursor: pointer;
+        transition: all 0.2s ease;
+        font-weight: 500;
       }
 
       .delete-button:hover {
-        background: #dc2626;
+        background: #b91c1c;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(220, 38, 38, 0.4);
       }
 
       .custom-payload-code {
         font-family: 'Monaco', 'Consolas', monospace;
         font-size: 10px;
-        color: #94a3b8;
-        background: #2d2d44;
-        padding: 4px 6px;
-        border-radius: 4px;
+        color: #06b6d4;
+        background: #0f172a;
+        padding: 8px 10px;
+        border-radius: 6px;
         word-break: break-all;
+        border: 1px solid #1e293b;
       }
 
       .custom-payload {
-        border-left: 3px solid #10b981;
+        border-left: 3px solid #dc2626;
       }
 
       @keyframes slideInRight {
