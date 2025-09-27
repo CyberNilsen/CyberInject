@@ -1,10 +1,11 @@
 class CyberInject {
   constructor() {
-    this.customPayloads = this.loadCustomPayloads();
+    this.customPayloads = [];
     this.init();
   }
 
-  init() {
+  async init() {
+    await this.loadCustomPayloads();
     this.setupTabNavigation();
     this.setupPayloadCopy();
     this.setupKeyboardShortcuts();
@@ -15,9 +16,16 @@ class CyberInject {
   }
 
   addDynamicStyles() {
-    const style = document.createElement('style');
+    var style = document.createElement('style');
     style.textContent = `
-      /* Additional CSS for header controls and settings */
+      .extension-container {
+        width: 380px !important;
+        height: 500px !important;
+        min-height: 500px !important;
+        max-height: 500px !important;
+        overflow: hidden !important;
+      }
+
       .header-controls {
         display: flex;
         align-items: center;
@@ -42,7 +50,6 @@ class CyberInject {
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       }
 
-      /* Settings Modal */
       .settings-modal {
         position: fixed;
         top: 0;
@@ -250,6 +257,45 @@ class CyberInject {
         border-left: 3px solid #dc2626;
       }
 
+      .settings-section {
+        padding: 20px 0;
+        height: calc(100vh - 140px);
+        max-height: 400px;
+        overflow-y: auto;
+        box-sizing: border-box;
+      }
+
+      .settings-section .settings-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #dc2626;
+        padding-bottom: 12px;
+      }
+
+      .settings-section .settings-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #0f172a;
+      }
+
+      .settings-section .close-button {
+        background: none;
+        border: none;
+        color: #64748b;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+      }
+
+      .settings-section .close-button:hover {
+        color: #dc2626;
+        background: #fef2f2;
+      }
+
       @keyframes slideInRight {
         from {
           transform: translateX(100%);
@@ -276,80 +322,229 @@ class CyberInject {
   }
 
   setupSettings() {
-    const settingsBtn = document.getElementById('settingsBtn');
-    const settingsModal = document.getElementById('settingsModal');
-    const closeSettings = document.getElementById('closeSettings');
-    const cancelAdd = document.getElementById('cancelAdd');
-    const payloadForm = document.getElementById('payloadForm');
+    var settingsBtn = document.getElementById('settingsBtn');
 
     if (settingsBtn) {
-      settingsBtn.addEventListener('click', () => {
-        settingsModal.classList.add('active');
-        this.renderCustomPayloadsInSettings();
-      });
-    }
-
-    if (closeSettings) {
-      closeSettings.addEventListener('click', () => {
-        settingsModal.classList.remove('active');
-      });
-    }
-
-    if (cancelAdd) {
-      cancelAdd.addEventListener('click', () => {
-        settingsModal.classList.remove('active');
-      });
-    }
-
-    if (settingsModal) {
-      settingsModal.addEventListener('click', (e) => {
-        if (e.target === settingsModal) {
-          settingsModal.classList.remove('active');
-        }
-      });
-    }
-
-    if (payloadForm) {
-      payloadForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        this.addCustomPayload();
-      });
+      settingsBtn.addEventListener('click', function() {
+        this.showSettingsOverlay();
+      }.bind(this));
     }
   }
 
-  addCustomPayload() {
-    const name = document.getElementById('payloadName').value.trim();
-    const category = document.getElementById('payloadCategory').value;
-    const code = document.getElementById('payloadCode').value.trim();
-    const description = document.getElementById('payloadDescription').value.trim();
+  showSettingsOverlay() {
+    // Create settings overlay that completely covers everything
+    var settingsOverlay = document.createElement('div');
+    settingsOverlay.id = 'settingsOverlay';
+    settingsOverlay.style.cssText = `
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 380px;
+      height: 500px;
+      background: #ffffff;
+      z-index: 10000;
+      padding: 16px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      overflow-x: hidden;
+    `;
+
+    settingsOverlay.innerHTML = `
+      <div class="settings-header">
+        <h2 class="settings-title">Custom Payloads</h2>
+        <button class="close-button" id="closeSettingsOverlay">&times;</button>
+      </div>
+
+      <form id="payloadFormOverlay">
+        <div class="form-group">
+          <label class="form-label">Payload Name</label>
+          <input type="text" class="form-input" id="payloadNameOverlay" placeholder="Enter payload name" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select class="form-select" id="payloadCategoryOverlay" required>
+            <option value="">Select Category</option>
+            <option value="xss">Cross-Site Scripting (XSS)</option>
+            <option value="sqli">SQL Injection</option>
+            <option value="ssrf">Server-Side Request Forgery</option>
+            <option value="lfi">Local File Inclusion</option>
+            <option value="other">Other Vulnerabilities</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Payload Code</label>
+          <textarea class="form-textarea" id="payloadCodeOverlay" placeholder="Enter your payload code" required style="min-height: 40px; max-height: 60px;"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <input type="text" class="form-input" id="payloadDescriptionOverlay" placeholder="Brief description of the payload" required>
+        </div>
+
+        <div class="button-group">
+          <button type="submit" class="btn btn-primary">Add Payload</button>
+          <button type="button" class="btn btn-secondary" id="cancelOverlay">Back to Payloads</button>
+        </div>
+      </form>
+
+      <div class="custom-payloads-list">
+        <h3 style="color: #0f172a; font-size: 14px; margin-bottom: 12px; font-weight: 600;">Your Custom Payloads</h3>
+        <div id="customPayloadsContainerOverlay" style="max-height: 100px; overflow-y: auto; overflow-x: hidden;"></div>
+      </div>
+    `;
+
+    // Add overlay to the extension container
+    document.querySelector('.extension-container').appendChild(settingsOverlay);
+
+    // Set up event listeners
+    var closeBtn = document.getElementById('closeSettingsOverlay');
+    var cancelBtn = document.getElementById('cancelOverlay');
+    var form = document.getElementById('payloadFormOverlay');
+
+    if (closeBtn) {
+      closeBtn.addEventListener('click', function() {
+        this.hideSettingsOverlay();
+      }.bind(this));
+    }
+
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', function() {
+        this.hideSettingsOverlay();
+      }.bind(this));
+    }
+
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        this.addCustomPayloadOverlay();
+      }.bind(this));
+    }
+
+    this.renderCustomPayloadsOverlay();
+  }
+
+  hideSettingsOverlay() {
+    var overlay = document.getElementById('settingsOverlay');
+    
+    if (overlay) {
+      overlay.remove();
+    }
+    
+    // Refresh the main interface to show new custom payloads
+    this.renderCustomPayloads();
+    this.updatePayloadCounts();
+  }
+
+  async addCustomPayloadOverlay() {
+    var name = document.getElementById('payloadNameOverlay').value.trim();
+    var category = document.getElementById('payloadCategoryOverlay').value;
+    var code = document.getElementById('payloadCodeOverlay').value.trim();
+    var description = document.getElementById('payloadDescriptionOverlay').value.trim();
 
     if (!name || !category || !code || !description) {
       this.showTemporaryMessage('Please fill in all fields', 'error');
       return;
     }
 
-    const payload = {
+    var payload = {
       id: Date.now().toString(),
-      name,
-      category,
-      code,
-      description,
+      name: name,
+      category: category,
+      code: code,
+      description: description,
       custom: true
     };
 
     this.customPayloads.push(payload);
-    this.saveCustomPayloads();
+    await this.saveCustomPayloads();
+    
+    document.getElementById('payloadFormOverlay').reset();
+    this.renderCustomPayloadsOverlay();
+    this.showTemporaryMessage('Added custom payload: ' + name, 'success');
+  }
+
+  renderCustomPayloadsOverlay() {
+    var container = document.getElementById('customPayloadsContainerOverlay');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    if (this.customPayloads.length === 0) {
+      container.innerHTML = '<p style="color: #64748b; font-size: 14px; text-align: center; padding: 20px;">No custom payloads yet. Add your first one above!</p>';
+      return;
+    }
+
+    for (var i = 0; i < this.customPayloads.length; i++) {
+      var payload = this.customPayloads[i];
+      var payloadItem = document.createElement('div');
+      payloadItem.className = 'custom-payload-item';
+      
+      payloadItem.innerHTML = `
+        <div class="custom-payload-header">
+          <span class="custom-payload-name">${this.escapeHtml(payload.name)} (${payload.category.toUpperCase()})</span>
+          <button class="delete-button" data-id="${payload.id}">Delete</button>
+        </div>
+        <div class="custom-payload-code">${this.escapeHtml(payload.code)}</div>
+      `;
+
+      var deleteBtn = payloadItem.querySelector('.delete-button');
+      deleteBtn.addEventListener('click', function(e) {
+        var id = e.target.getAttribute('data-id');
+        if (confirm('Are you sure you want to delete this custom payload?')) {
+          this.deleteCustomPayloadOverlay(id);
+        }
+      }.bind(this));
+
+      container.appendChild(payloadItem);
+    }
+  }
+
+  async deleteCustomPayloadOverlay(id) {
+    this.customPayloads = this.customPayloads.filter(function(payload) {
+      return payload.id !== id;
+    });
+    await this.saveCustomPayloads();
+    this.renderCustomPayloadsOverlay();
+    this.showTemporaryMessage('Custom payload deleted', 'success');
+  }
+
+  async addCustomPayload() {
+    var name = document.getElementById('payloadName').value.trim();
+    var category = document.getElementById('payloadCategory').value;
+    var code = document.getElementById('payloadCode').value.trim();
+    var description = document.getElementById('payloadDescription').value.trim();
+
+    if (!name || !category || !code || !description) {
+      this.showTemporaryMessage('Please fill in all fields', 'error');
+      return;
+    }
+
+    var payload = {
+      id: Date.now().toString(),
+      name: name,
+      category: category,
+      code: code,
+      description: description,
+      custom: true
+    };
+
+    this.customPayloads.push(payload);
+    await this.saveCustomPayloads();
     this.renderCustomPayloads();
     this.updatePayloadCounts();
     
     document.getElementById('payloadForm').reset();
     this.renderCustomPayloadsInSettings();
-    this.showTemporaryMessage(`Added custom payload: ${name}`, 'success');
+    this.showTemporaryMessage('Added custom payload: ' + name, 'success');
   }
 
-  deleteCustomPayload(id) {
-    this.customPayloads = this.customPayloads.filter(payload => payload.id !== id);
-    this.saveCustomPayloads();
+  async deleteCustomPayload(id) {
+    this.customPayloads = this.customPayloads.filter(function(payload) {
+      return payload.id !== id;
+    });
+    await this.saveCustomPayloads();
     this.renderCustomPayloads();
     this.renderCustomPayloadsInSettings();
     this.updatePayloadCounts();
@@ -357,18 +552,19 @@ class CyberInject {
   }
 
   renderCustomPayloads() {
-    this.customPayloads.forEach(payload => {
-      const section = document.getElementById(payload.category);
-      if (!section) return;
+    for (var i = 0; i < this.customPayloads.length; i++) {
+      var payload = this.customPayloads[i];
+      var section = document.getElementById(payload.category);
+      if (!section) continue;
 
-      const payloadGrid = section.querySelector('.payload-grid');
+      var payloadGrid = section.querySelector('.payload-grid');
       
-      const existing = payloadGrid.querySelector(`[data-custom-id="${payload.id}"]`);
+      var existing = payloadGrid.querySelector('[data-custom-id="' + payload.id + '"]');
       if (existing) {
         existing.remove();
       }
 
-      const payloadCard = document.createElement('div');
+      var payloadCard = document.createElement('div');
       payloadCard.className = 'payload-card custom-payload';
       payloadCard.setAttribute('data-payload', payload.code);
       payloadCard.setAttribute('data-custom-id', payload.id);
@@ -384,11 +580,11 @@ class CyberInject {
 
       this.setupPayloadCardEvents(payloadCard);
       payloadGrid.appendChild(payloadCard);
-    });
+    }
   }
 
   renderCustomPayloadsInSettings() {
-    const container = document.getElementById('customPayloadsContainer');
+    var container = document.getElementById('customPayloadsContainer');
     if (!container) return;
 
     container.innerHTML = '';
@@ -398,8 +594,9 @@ class CyberInject {
       return;
     }
 
-    this.customPayloads.forEach(payload => {
-      const payloadItem = document.createElement('div');
+    for (var i = 0; i < this.customPayloads.length; i++) {
+      var payload = this.customPayloads[i];
+      var payloadItem = document.createElement('div');
       payloadItem.className = 'custom-payload-item';
       
       payloadItem.innerHTML = `
@@ -410,62 +607,104 @@ class CyberInject {
         <div class="custom-payload-code">${this.escapeHtml(payload.code)}</div>
       `;
 
-      const deleteBtn = payloadItem.querySelector('.delete-button');
-      deleteBtn.addEventListener('click', () => {
+      var deleteBtn = payloadItem.querySelector('.delete-button');
+      deleteBtn.addEventListener('click', function(e) {
+        var id = e.target.getAttribute('data-id');
         if (confirm('Are you sure you want to delete this custom payload?')) {
-          this.deleteCustomPayload(payload.id);
+          this.deleteCustomPayload(id);
         }
-      });
+      }.bind(this));
 
       container.appendChild(payloadItem);
-    });
+    }
   }
 
   setupPayloadCardEvents(card) {
-    card.addEventListener('click', async (e) => {
+    var self = this;
+    card.addEventListener('click', function(e) {
       e.preventDefault();
       
-      const payload = card.getAttribute('data-payload');
-      const copyButton = card.querySelector('.copy-button');
-      const payloadName = card.querySelector('.payload-name').textContent;
+      var payload = card.getAttribute('data-payload');
+      var copyButton = card.querySelector('.copy-button');
+      var payloadName = card.querySelector('.payload-name').textContent;
 
-      try {
-        await this.copyToClipboard(payload);
-        this.showCopySuccess(card, copyButton, payloadName);
-        console.log(`Copied payload: ${payloadName}`);
-      } catch (error) {
+      self.copyToClipboard(payload).then(function() {
+        self.showCopySuccess(card, copyButton, payloadName);
+        console.log('Copied payload: ' + payloadName);
+      }).catch(function(error) {
         console.error('Copy failed:', error);
-        this.showCopyError(card, copyButton);
-      }
+        self.showCopyError(card, copyButton);
+      });
     });
 
-    card.addEventListener('mouseenter', () => {
-      const copyButton = card.querySelector('.copy-button');
+    card.addEventListener('mouseenter', function() {
+      var copyButton = card.querySelector('.copy-button');
       copyButton.textContent = '📋';
     });
 
-    card.addEventListener('mouseleave', () => {
-      const copyButton = card.querySelector('.copy-button');
+    card.addEventListener('mouseleave', function() {
+      var copyButton = card.querySelector('.copy-button');
       if (!card.classList.contains('copied')) {
         copyButton.textContent = '📋';
       }
     });
   }
 
-  loadCustomPayloads() {
+  async loadCustomPayloads() {
     try {
-      // Use in-memory storage instead of localStorage for Claude.ai compatibility
-      return window.customPayloadsData || [];
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
+        const result = await new Promise((resolve) => {
+          chrome.storage.sync.get(['customPayloads'], (result) => {
+            resolve(result);
+          });
+        });
+        this.customPayloads = result.customPayloads || [];
+      } else if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        const result = await new Promise((resolve) => {
+          chrome.storage.local.get(['customPayloads'], (result) => {
+            resolve(result);
+          });
+        });
+        this.customPayloads = result.customPayloads || [];
+      } else {
+        // Fallback to localStorage for non-extension environments
+        var stored = localStorage.getItem('cyberInjectCustomPayloads');
+        this.customPayloads = stored ? JSON.parse(stored) : [];
+      }
+      console.log('Loaded custom payloads:', this.customPayloads);
     } catch (error) {
       console.warn('Failed to load custom payloads:', error);
-      return [];
+      this.customPayloads = [];
     }
   }
 
-  saveCustomPayloads() {
+  async saveCustomPayloads() {
     try {
-      // Use in-memory storage instead of localStorage for Claude.ai compatibility
-      window.customPayloadsData = this.customPayloads;
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
+        await new Promise((resolve, reject) => {
+          chrome.storage.sync.set({ customPayloads: this.customPayloads }, () => {
+            if (chrome.runtime.lastError) {
+              reject(chrome.runtime.lastError);
+            } else {
+              resolve();
+            }
+          });
+        });
+      } else if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        await new Promise((resolve, reject) => {
+          chrome.storage.local.set({ customPayloads: this.customPayloads }, () => {
+            if (chrome.runtime.lastError) {
+              reject(chrome.runtime.lastError);
+            } else {
+              resolve();
+            }
+          });
+        });
+      } else {
+        // Fallback to localStorage for non-extension environments
+        localStorage.setItem('cyberInjectCustomPayloads', JSON.stringify(this.customPayloads));
+      }
+      console.log('Saved custom payloads:', this.customPayloads);
     } catch (error) {
       console.warn('Failed to save custom payloads:', error);
       this.showTemporaryMessage('Failed to save custom payload', 'error');
@@ -473,66 +712,77 @@ class CyberInject {
   }
 
   escapeHtml(text) {
-    const div = document.createElement('div');
+    var div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
   }
 
   setupTabNavigation() {
-    const tabButtons = document.querySelectorAll('.tab-button');
-    const payloadSections = document.querySelectorAll('.payload-section');
+    var tabButtons = document.querySelectorAll('.tab-button');
+    var payloadSections = document.querySelectorAll('.payload-section');
+    var self = this;
 
-    tabButtons.forEach(button => {
-      button.addEventListener('click', (e) => {
+    for (var i = 0; i < tabButtons.length; i++) {
+      tabButtons[i].addEventListener('click', function(e) {
         e.preventDefault();
         
-        tabButtons.forEach(tab => tab.classList.remove('active'));
-        payloadSections.forEach(section => section.classList.remove('active'));
+        for (var j = 0; j < tabButtons.length; j++) {
+          tabButtons[j].classList.remove('active');
+        }
+        for (var k = 0; k < payloadSections.length; k++) {
+          payloadSections[k].classList.remove('active');
+        }
 
-        button.classList.add('active');
+        this.classList.add('active');
 
-        const categoryId = button.getAttribute('data-category');
-        const targetSection = document.getElementById(categoryId);
+        var categoryId = this.getAttribute('data-category');
+        var targetSection = document.getElementById(categoryId);
         
         if (targetSection) {
           targetSection.classList.add('active');
           
-          const contentArea = document.querySelector('.content-area');
+          var contentArea = document.querySelector('.content-area');
           contentArea.scrollTop = 0;
         }
 
-        button.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-          button.style.transform = '';
-        }, 150);
+        this.style.transform = 'scale(0.95)';
+        setTimeout(function() {
+          this.style.transform = '';
+        }.bind(this), 150);
       });
-    });
+    }
   }
 
   setupPayloadCopy() {
-    const payloadCards = document.querySelectorAll('.payload-card');
+    var payloadCards = document.querySelectorAll('.payload-card');
 
-    payloadCards.forEach(card => {
-      this.setupPayloadCardEvents(card);
+    for (var i = 0; i < payloadCards.length; i++) {
+      this.setupPayloadCardEvents(payloadCards[i]);
+    }
+  }
+
+  copyToClipboard(text) {
+    var self = this;
+    return new Promise(function(resolve, reject) {
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(text).then(resolve).catch(function(error) {
+            console.warn('Clipboard API failed, using fallback:', error);
+            self.fallbackCopyToClipboard(text).then(resolve).catch(reject);
+          });
+        } else {
+          self.fallbackCopyToClipboard(text).then(resolve).catch(reject);
+        }
+      } catch (error) {
+        console.warn('Clipboard API failed, using fallback:', error);
+        self.fallbackCopyToClipboard(text).then(resolve).catch(reject);
+      }
     });
   }
 
-  async copyToClipboard(text) {
-    try {
-      if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(text);
-        return;
-      }
-    } catch (error) {
-      console.warn('Clipboard API failed, using fallback:', error);
-    }
-
-    return this.fallbackCopyToClipboard(text);
-  }
-
   fallbackCopyToClipboard(text) {
-    return new Promise((resolve, reject) => {
-      const textArea = document.createElement('textarea');
+    return new Promise(function(resolve, reject) {
+      var textArea = document.createElement('textarea');
       textArea.value = text;
       textArea.style.position = 'fixed';
       textArea.style.left = '-999999px';
@@ -543,7 +793,7 @@ class CyberInject {
       textArea.select();
 
       try {
-        const successful = document.execCommand('copy');
+        var successful = document.execCommand('copy');
         document.body.removeChild(textArea);
         
         if (successful) {
@@ -559,14 +809,15 @@ class CyberInject {
   }
 
   showCopySuccess(card, copyButton, payloadName) {
+    var self = this;
     card.classList.add('copied');
     
     copyButton.textContent = '✅';
     copyButton.style.transform = 'scale(1.2)';
     
-    this.showTemporaryMessage(`Copied: ${payloadName}`, 'success');
+    this.showTemporaryMessage('Copied: ' + payloadName, 'success');
     
-    setTimeout(() => {
+    setTimeout(function() {
       card.classList.remove('copied');
       copyButton.textContent = '📋';
       copyButton.style.transform = '';
@@ -574,43 +825,45 @@ class CyberInject {
   }
 
   showCopyError(card, copyButton) {
+    var self = this;
     card.style.borderColor = '#ef4444';
     copyButton.textContent = '❌';
     
     this.showTemporaryMessage('Copy failed. Please try again.', 'error');
     
-    setTimeout(() => {
+    setTimeout(function() {
       card.style.borderColor = '';
       copyButton.textContent = '📋';
     }, 2000);
   }
 
-  showTemporaryMessage(message, type = 'info') {
-    const existingMessages = document.querySelectorAll('.temp-message');
-    existingMessages.forEach(msg => msg.remove());
+  showTemporaryMessage(message, type) {
+    type = type || 'info';
+    var existingMessages = document.querySelectorAll('.temp-message');
+    for (var i = 0; i < existingMessages.length; i++) {
+      existingMessages[i].remove();
+    }
 
-    const messageEl = document.createElement('div');
-    messageEl.className = `temp-message temp-message-${type}`;
+    var messageEl = document.createElement('div');
+    messageEl.className = 'temp-message temp-message-' + type;
     messageEl.textContent = message;
     
-    Object.assign(messageEl.style, {
-      position: 'fixed',
-      top: '20px',
-      right: '20px',
-      background: type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6',
-      color: 'white',
-      padding: '8px 12px',
-      borderRadius: '6px',
-      fontSize: '12px',
-      fontWeight: '500',
-      zIndex: '10000',
-      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-      animation: 'slideInRight 0.3s ease, slideOutRight 0.3s ease 2.7s forwards'
-    });
+    messageEl.style.position = 'fixed';
+    messageEl.style.top = '20px';
+    messageEl.style.right = '20px';
+    messageEl.style.background = type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6';
+    messageEl.style.color = 'white';
+    messageEl.style.padding = '8px 12px';
+    messageEl.style.borderRadius = '6px';
+    messageEl.style.fontSize = '12px';
+    messageEl.style.fontWeight = '500';
+    messageEl.style.zIndex = '10000';
+    messageEl.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+    messageEl.style.animation = 'slideInRight 0.3s ease, slideOutRight 0.3s ease 2.7s forwards';
 
     document.body.appendChild(messageEl);
 
-    setTimeout(() => {
+    setTimeout(function() {
       if (messageEl.parentNode) {
         messageEl.remove();
       }
@@ -618,14 +871,15 @@ class CyberInject {
   }
 
   setupKeyboardShortcuts() {
-    document.addEventListener('keydown', (e) => {
+    var self = this;
+    document.addEventListener('keydown', function(e) {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
         return;
       }
 
       if (e.key >= '1' && e.key <= '5') {
-        const tabIndex = parseInt(e.key) - 1;
-        const tabs = document.querySelectorAll('.tab-button');
+        var tabIndex = parseInt(e.key) - 1;
+        var tabs = document.querySelectorAll('.tab-button');
         
         if (tabs[tabIndex]) {
           tabs[tabIndex].click();
@@ -633,7 +887,7 @@ class CyberInject {
       }
 
       if (e.key === 'Escape') {
-        const modal = document.getElementById('settingsModal');
+        var modal = document.getElementById('settingsModal');
         if (modal && modal.classList.contains('active')) {
           modal.classList.remove('active');
         }
@@ -642,54 +896,58 @@ class CyberInject {
   }
 
   updatePayloadCounts() {
-    const sections = document.querySelectorAll('.payload-section');
+    var sections = document.querySelectorAll('.payload-section');
     
-    sections.forEach(section => {
-      const payloadCards = section.querySelectorAll('.payload-card');
-      const countElement = section.querySelector('.payload-count');
+    for (var i = 0; i < sections.length; i++) {
+      var section = sections[i];
+      var payloadCards = section.querySelectorAll('.payload-card');
+      var countElement = section.querySelector('.payload-count');
       
       if (countElement) {
-        const count = payloadCards.length;
-        countElement.textContent = `${count} payload${count !== 1 ? 's' : ''}`;
+        var count = payloadCards.length;
+        countElement.textContent = count + ' payload' + (count !== 1 ? 's' : '');
       }
-    });
+    }
   }
 
   getStats() {
-    const sections = document.querySelectorAll('.payload-section');
-    let totalPayloads = 0;
-    const categoryStats = {};
+    var sections = document.querySelectorAll('.payload-section');
+    var totalPayloads = 0;
+    var categoryStats = {};
 
-    sections.forEach(section => {
-      const categoryId = section.id;
-      const payloadCount = section.querySelectorAll('.payload-card').length;
+    for (var i = 0; i < sections.length; i++) {
+      var section = sections[i];
+      var categoryId = section.id;
+      var payloadCount = section.querySelectorAll('.payload-card').length;
       
       categoryStats[categoryId] = payloadCount;
       totalPayloads += payloadCount;
-    });
+    }
 
     return {
-      totalPayloads,
+      totalPayloads: totalPayloads,
       categories: Object.keys(categoryStats).length,
-      categoryStats,
+      categoryStats: categoryStats,
       customPayloads: this.customPayloads.length
     };
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
   console.log('🛡️ CyberInject Security Testing Toolkit Loaded');
   
-  const cyberInject = new CyberInject();
+  var cyberInject = new CyberInject();
   
-  const stats = cyberInject.getStats();
-  console.log('📊 Extension Stats:', stats);
+  setTimeout(function() {
+    var stats = cyberInject.getStats();
+    console.log('📊 Extension Stats:', stats);
+  }, 1000);
   
   window.cyberInject = cyberInject;
 });
 
 if (typeof chrome !== 'undefined' && chrome.runtime) {
-  chrome.runtime.onSuspend.addListener(() => {
+  chrome.runtime.onSuspend.addListener(function() {
     console.log('🔄 CyberInject extension suspending');
   });
 }
