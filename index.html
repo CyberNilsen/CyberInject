@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="128.png">
+    <title>CyberInject - Professional Security Testing Toolkit</title>
+    <style>
+        :root {
+            --primary-red: #dc2626;
+            --primary-red-dark: #b91c1c;
+            --primary-red-light: #ef4444;
+            --accent-orange: #f97316;
+            --accent-emerald: #10b981;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-500: #64748b;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-tertiary: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            overflow-x: hidden;
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(220, 38, 38, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(59, 130, 246, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 800px;
+            padding: 0 2rem;
+            z-index: 2;
+            position: relative;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo-container {
+            margin-bottom: 2rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .hero-logo {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-red-dark) 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            box-shadow: 0 20px 40px rgba(220, 38, 38, 0.3);
+            font-size: 48px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-logo::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--primary-red), var(--accent-orange), var(--primary-red));
+            border-radius: 22px;
+            z-index: -1;
+            animation: borderGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes borderGlow {
+            0% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .hero .subtitle {
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            color: #94a3b8;
+            margin-bottom: 3rem;
+            font-weight: 500;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 4rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-red-dark) 100%);
+            color: white;
+            box-shadow: 0 10px 25px rgba(220, 38, 38, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(220, 38, 38, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 255, 255, 0.1);
+        }
+
+        .ethics-banner {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(185, 28, 28, 0.1) 100%);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(239, 68, 68, 0.5); }
+        }
+
+        .ethics-banner .warning-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            animation: bounce 1s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .ethics-banner h3 {
+            color: #fecaca;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .ethics-banner p {
+            color: #f3f4f6;
+            font-size: 1rem;
+        }
+
+        .features {
+            padding: 6rem 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(15, 23, 42, 0.5) 100%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title {
+            font-size: clamp(2.5rem, 6vw, 3.5rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: #94a3b8;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-red), var(--accent-orange), var(--accent-emerald));
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover::before {
+            transform: translateX(0);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+
+        .payload-showcase {
+            padding: 6rem 0;
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        .showcase-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .payload-category {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .payload-category:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            border-color: var(--primary-red);
+        }
+
+        .category-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .category-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .category-count {
+            color: var(--primary-red);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .category-description {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .stats {
+            padding: 4rem 0;
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-red-dark) 100%);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            text-align: center;
+        }
+
+        .stat-item h3 {
+            font-size: 3rem;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-item p {
+            color: #fca5a5;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .footer {
+            padding: 3rem 0 2rem;
+            background: var(--gray-900);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h4 {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section p, .footer-section a {
+            color: #94a3b8;
+            text-decoration: none;
+            line-height: 1.6;
+        }
+
+        .footer-section a:hover {
+            color: var(--primary-red);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 2rem;
+            text-align: center;
+            color: #64748b;
+        }
+
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .floating-element {
+            position: absolute;
+            background: rgba(220, 38, 38, 0.1);
+            border-radius: 50%;
+            animation: float-random 20s linear infinite;
+        }
+
+        .floating-element:nth-child(1) {
+            width: 60px;
+            height: 60px;
+            left: 10%;
+            animation-delay: 0s;
+            animation-duration: 25s;
+        }
+
+        .floating-element:nth-child(2) {
+            width: 40px;
+            height: 40px;
+            left: 70%;
+            animation-delay: 5s;
+            animation-duration: 20s;
+        }
+
+        .floating-element:nth-child(3) {
+            width: 80px;
+            height: 80px;
+            left: 50%;
+            animation-delay: 10s;
+            animation-duration: 30s;
+        }
+
+        @keyframes float-random {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .showcase-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+            color: white;
+            font-size: 2rem;
+            opacity: 0.7;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-close {
+            color: #94a3b8;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--primary-red);
+        }
+
+        .modal h3 {
+            color: white;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .modal p {
+            color: #94a3b8;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .installation {
+            padding: 6rem 0;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        }
+
+        .install-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .step {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: var(--primary-red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin: 0 auto 1rem;
+        }
+
+        .step h3 {
+            color: white;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .step p {
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <section class="hero">
+        <div class="floating-elements">
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
+        </div>
+        
+        <div class="hero-content">
+            <div class="logo-container">
+                <div class="hero-logo">🛡️</div>
+            </div>
+            
+            <h1>CyberInject</h1>
+            <p class="subtitle">Professional Security Testing Toolkit</p>
+            
+            <div class="ethics-banner">
+                <div class="warning-icon">⚠️</div>
+                <h3>Ethical Use Only</h3>
+                <p>This tool is designed for authorized security testing and research purposes only. Always obtain proper permission before testing any system you do not own.</p>
+            </div>
+            
+            <div class="hero-buttons">
+                <a href="https://chromewebstore.google.com/detail/cyberinject/dgnnpllamcglhcfmppgijeindohkkabm" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+                    <span>🌐</span>
+                    Download for Chrome
+                </a>
+                <a href="https://addons.mozilla.org/en-US/firefox/addon/cyberinject/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+                    <span>🦊</span>
+                    Download for Firefox
+                </a>
+                <a href="https://github.com/CyberNilsen/CyberInject" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+                    <span>⚡</span>
+                    View Source Code
+                </a>
+                <a href="#features" class="btn btn-secondary">
+                    <span>🚀</span>
+                    Explore Features
+                </a>
+            </div>
+        </div>
+        
+        <div class="scroll-indicator">⬇</div>
+    </section>
+
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Powerful Features</h2>
+                <p class="section-subtitle">Comprehensive security testing capabilities in one convenient extension</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <span class="feature-icon">⚡</span>
+                    <h3>One-Click Payload Copying</h3>
+                    <p>Instantly copy security testing payloads to your clipboard with a single click. No more manual typing or searching through documentation.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <span class="feature-icon">🔧</span>
+                    <h3>Custom Payload Management</h3>
+                    <p>Create, organize, and manage your own custom payloads. Build your personal arsenal of testing vectors for specific scenarios.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <span class="feature-icon">🎯</span>
+                    <h3>Categorized Testing Vectors</h3>
+                    <p>Organized by vulnerability type including XSS, SQLi, SSRF, LFI, and more. Find the right payload for your specific testing needs.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <span class="feature-icon">⚙️</span>
+                    <h3>Professional Interface</h3>
+                    <p>Clean, intuitive design optimized for security professionals. Navigate quickly between categories and access payloads efficiently.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <span class="feature-icon">🛡️</span>
+                    <h3>Ethical Guidelines</h3>
+                    <p>Built-in reminders and warnings to ensure responsible use. Promotes ethical hacking practices and authorized testing only.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <span class="feature-icon">📱</span>
+                    <h3>Always Accessible</h3>
+                    <p>Browser extension format means your testing tools are always just a click away, wherever you're conducting security assessments.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="payload-showcase">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Payload Categories</h2>
+                <p class="section-subtitle">Comprehensive coverage of common web application vulnerabilities</p>
+            </div>
+            
+            <div class="showcase-grid">
+                <div class="payload-category">
+                    <span class="category-icon">⚡</span>
+                    <h3 class="category-title">Cross-Site Scripting</h3>
+                    <div class="category-count">15 payloads</div>
+                    <p class="category-description">XSS testing vectors for various contexts including reflected, stored, and DOM-based attacks</p>
+                </div>
+                
+                <div class="payload-category">
+                    <span class="category-icon">🗃️</span>
+                    <h3 class="category-title">SQL Injection</h3>
+                    <div class="category-count">15 payloads</div>
+                    <p class="category-description">Database injection payloads for authentication bypass, data extraction, and enumeration</p>
+                </div>
+                
+                <div class="payload-category">
+                    <span class="category-icon">🌐</span>
+                    <h3 class="category-title">Server-Side Request Forgery</h3>
+                    <div class="category-count">12 payloads</div>
+                    <p class="category-description">SSRF vectors targeting internal services, cloud metadata, and network resources</p>
+                </div>
+                
+                <div class="payload-category">
+                    <span class="category-icon">📁</span>
+                    <h3 class="category-title">Local File Inclusion</h3>
+                    <div class="category-count">12 payloads</div>
+                    <p class="category-description">File inclusion attacks for accessing sensitive files and system information</p>
+                </div>
+                
+                <div class="payload-category">
+                    <span class="category-icon">🔧</span>
+                    <h3 class="category-title">Other Vulnerabilities</h3>
+                    <div class="category-count">15 payloads</div>
+                    <p class="category-description">Template injection, command injection, XXE, and other common web vulnerabilities</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <h3>69+</h3>
+                    <p>Security Payloads</p>
+                </div>
+                <div class="stat-item">
+                    <h3>5</h3>
+                    <p>Vulnerability Categories</p>
+                </div>
+                <div class="stat-item">
+                    <h3>∞</h3>
+                    <p>Custom Payloads</p>
+                </div>
+                <div class="stat-item">
+                    <h3>100%</h3>
+                    <p>Ethical Use</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="installation" class="installation">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Get CyberInject</h2>
+                <p class="section-subtitle">Download the extension for your preferred browser</p>
+            </div>
+            
+            <div class="hero-buttons" style="margin-bottom: 3rem;">
+                <a href="https://chromewebstore.google.com/detail/cyberinject/dgnnpllamcglhcfmppgijeindohkkabm" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+                    <span>🌐</span>
+                    Download for Chrome
+                </a>
+                <a href="https://addons.mozilla.org/en-US/firefox/addon/cyberinject/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+                    <span>🦊</span>
+                    Download for Firefox
+                </a>
+            </div>
+            
+            <div class="install-steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Choose Your Browser</h3>
+                    <p>Click the download button for your preferred browser to visit the official extension store.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Install Extension</h3>
+                    <p>Click "Add to Chrome" or "Add to Firefox" on the extension store page to install CyberInject.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Start Testing</h3>
+                    <p>Click the CyberInject icon in your browser toolbar and begin your authorized security testing.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal for footer links -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>CyberInject</h4>
+                    <p>Professional security testing toolkit designed for ethical hackers, penetration testers, and security researchers.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <p><a href="#" onclick="showModal('disclaimer')">Disclaimer</a></p>
+                    <p><a href="#" onclick="showModal('terms')">Terms of Use</a></p>
+                    <p><a href="#" onclick="showModal('responsible-disclosure')">Responsible Disclosure</a></p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <p><a href="#" onclick="showModal('documentation')">Documentation</a></p>
+                    <p><a href="https://github.com/CyberNilsen/CyberInject" target="_blank" rel="noopener noreferrer">GitHub Repository</a></p>
+                    <p><a href="#" onclick="showModal('support')">Support</a></p>
+                    <p><a href="#" onclick="showModal('community')">Community</a></p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Security</h4>
+                    <p>This tool is intended for authorized testing only. Users are responsible for ensuring they have proper permission before testing any systems.</p>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 CyberInject. Professional Security Testing Toolkit. Use responsibly.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add scroll-based animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements for animation
+        document.querySelectorAll('.feature-card, .payload-category, .step').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+
+        // Counter animation for stats
+        function animateCounter(element, target) {
+            let current = 0;
+            const increment = target / 50;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                element.textContent = target === Infinity ? '∞' : Math.floor(current) + (target > 100 ? '+' : '');
+            }, 40);
+        }
+
+        // Animate stats when they come into view
+        const statsObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const statItems = entry.target.querySelectorAll('.stat-item h3');
+                    const values = [69, 5, Infinity, 100];
+                    
+                    statItems.forEach((item, index) => {
+                        animateCounter(item, values[index]);
+                    });
+                    
+                    statsObserver.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        const statsSection = document.querySelector('.stats');
+        if (statsSection) {
+            statsObserver.observe(statsSection);
+        }
+
+        // Add interactive hover effects
+        document.querySelectorAll('.payload-category').forEach(category => {
+            category.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px) scale(1.02)';
+            });
+            
+            category.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // Parallax effect for floating elements
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const parallax = document.querySelectorAll('.floating-element');
+            
+            parallax.forEach((element, index) => {
+                const speed = 0.5 + (index * 0.1);
+                element.style.transform = `translateY(${scrolled * speed}px) rotate(${scrolled * 0.1}deg)`;
+            });
+        });
+
+        // Hide scroll indicator when user starts scrolling
+        window.addEventListener('scroll', function() {
+            const scrollIndicator = document.querySelector('.scroll-indicator');
+            if (scrollIndicator) {
+                if (window.pageYOffset > 100) {
+                    scrollIndicator.style.opacity = '0';
+                } else {
+                    scrollIndicator.style.opacity = '0.7';
+                }
+            }
+        });
+
+        // Add typing effect to hero subtitle
+        function typeWriter(element, text, speed = 100) {
+            let i = 0;
+            element.textContent = '';
+            
+            function type() {
+                if (i < text.length) {
+                    element.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                }
+            }
+            
+            setTimeout(type, 1000); // Start after 1 second
+        }
+
+        // Initialize typing effect
+        window.addEventListener('load', function() {
+            const subtitle = document.querySelector('.hero .subtitle');
+            if (subtitle) {
+                const originalText = subtitle.textContent;
+                typeWriter(subtitle, originalText, 50);
+            }
+        });
+
+        // Add glow effect to buttons on hover
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                this.style.boxShadow = this.classList.contains('btn-primary') 
+                    ? '0 20px 40px rgba(220, 38, 38, 0.6), 0 0 30px rgba(220, 38, 38, 0.4)' 
+                    : '0 10px 25px rgba(255, 255, 255, 0.2), 0 0 20px rgba(255, 255, 255, 0.1)';
+            });
+            
+            btn.addEventListener('mouseleave', function() {
+                this.style.boxShadow = this.classList.contains('btn-primary')
+                    ? '0 10px 25px rgba(220, 38, 38, 0.4)'
+                    : '0 10px 25px rgba(255, 255, 255, 0.1)';
+            });
+        });
+
+        // Add click ripple effect
+        document.querySelectorAll('.btn, .payload-category, .feature-card').forEach(element => {
+            element.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.cssText = `
+                    position: absolute;
+                    border-radius: 50%;
+                    background: rgba(255, 255, 255, 0.3);
+                    transform: scale(0);
+                    animation: ripple 0.6s linear;
+                    left: ${x}px;
+                    top: ${y}px;
+                    width: ${size}px;
+                    height: ${size}px;
+                    pointer-events: none;
+                `;
+                
+                this.style.position = 'relative';
+                this.style.overflow = 'hidden';
+                this.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+
+        // Add ripple animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(2);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Add gradient text animation
+        const gradientTexts = document.querySelectorAll('.section-title, .hero h1');
+        gradientTexts.forEach(text => {
+            text.style.backgroundSize = '200% 200%';
+            text.style.animation = 'gradientShift 3s ease-in-out infinite';
+        });
+
+        const gradientStyle = document.createElement('style');
+        gradientStyle.textContent = `
+            @keyframes gradientShift {
+                0%, 100% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+            }
+        `;
+        document.head.appendChild(gradientStyle);
+
+        // Modal functionality for footer links
+        function showModal(type) {
+            const modal = document.getElementById('modal');
+            const modalBody = document.getElementById('modal-body');
+            
+            const content = {
+                'disclaimer': {
+                    title: 'Disclaimer',
+                    content: `
+                        <h3>Legal Disclaimer</h3>
+                        <p>CyberInject is a security testing tool designed for authorized penetration testing and security research purposes only. By using this tool, you acknowledge and agree to the following:</p>
+                        <p><strong>Authorized Use Only:</strong> This tool must only be used on systems you own, have explicit written permission to test, or are part of authorized security assessments.</p>
+                        <p><strong>No Malicious Use:</strong> CyberInject is not intended for malicious attacks, unauthorized access, or illegal activities of any kind.</p>
+                        <p><strong>User Responsibility:</strong> Users are solely responsible for ensuring their use of this tool complies with applicable laws and regulations.</p>
+                        <p><strong>No Warranty:</strong> This tool is provided "as is" without any warranties or guarantees.</p>
+                        <p><strong>Educational Purpose:</strong> This tool is designed to help security professionals identify vulnerabilities in authorized systems to improve security posture.</p>
+                    `
+                },
+                'terms': {
+                    title: 'Terms of Use',
+                    content: `
+                        <h3>Terms of Use</h3>
+                        <p>By downloading and using CyberInject, you agree to these terms:</p>
+                        <p><strong>1. Authorized Testing Only:</strong> You will only use this tool on systems you have explicit permission to test.</p>
+                        <p><strong>2. Legal Compliance:</strong> You will comply with all applicable local, state, and federal laws.</p>
+                        <p><strong>3. Professional Use:</strong> This tool is intended for security professionals, researchers, and authorized ethical hackers.</p>
+                        <p><strong>4. No Distribution of Malicious Content:</strong> You will not use this tool to create or distribute malicious content.</p>
+                        <p><strong>5. Responsible Disclosure:</strong> Any vulnerabilities discovered using this tool should be reported responsibly.</p>
+                        <p><strong>6. Limitation of Liability:</strong> The creators of CyberInject are not liable for any misuse of this tool.</p>
+                    `
+                },
+                'responsible-disclosure': {
+                    title: 'Responsible Disclosure',
+                    content: `
+                        <h3>Responsible Disclosure Policy</h3>
+                        <p>We believe in responsible security research and encourage the security community to help improve the safety of the internet.</p>
+                        <p><strong>Guidelines for Security Researchers:</strong></p>
+                        <p>• Only test systems you have permission to access</p>
+                        <p>• Do not access, modify, or delete user data</p>
+                        <p>• Report vulnerabilities privately to the affected organization</p>
+                        <p>• Allow reasonable time for remediation before public disclosure</p>
+                        <p>• Follow coordinated vulnerability disclosure practices</p>
+                        <p><strong>Reporting Vulnerabilities:</strong> If you discover vulnerabilities in CyberInject itself, please report them responsibly through appropriate channels.</p>
+                    `
+                },
+                'documentation': {
+                    title: 'Documentation',
+                    content: `
+                        <h3>Documentation</h3>
+                        <p>CyberInject provides comprehensive security testing capabilities through an intuitive browser extension interface.</p>
+                        <p><strong>Getting Started:</strong></p>
+                        <p>1. Install the extension from Chrome Web Store or Firefox Add-ons</p>
+                        <p>2. Click the CyberInject icon in your browser toolbar</p>
+                        <p>3. Select the appropriate vulnerability category</p>
+                        <p>4. Click any payload to copy it to your clipboard</p>
+                        <p><strong>Features:</strong></p>
+                        <p>• 69+ pre-built security testing payloads</p>
+                        <p>• Custom payload creation and management</p>
+                        <p>• Organized by vulnerability type (XSS, SQLi, SSRF, LFI, Other)</p>
+                        <p>• One-click payload copying</p>
+                        <p>• Professional testing interface</p>
+                    `
+                },
+                'support': {
+                    title: 'Support',
+                    content: `
+                        <h3>Support</h3>
+                        <p>Need help with CyberInject? We're here to assist security professionals and researchers.</p>
+                        <p><strong>Common Issues:</strong></p>
+                        <p>• Ensure you have the latest version installed</p>
+                        <p>• Check that your browser allows clipboard access</p>
+                        <p>• Verify the extension has proper permissions</p>
+                        <p><strong>Feature Requests:</strong> We welcome feedback and suggestions for improving CyberInject's security testing capabilities.</p>
+                        <p><strong>Bug Reports:</strong> Help us improve by reporting any issues you encounter during authorized testing.</p>
+                        <p><strong>Professional Consulting:</strong> For enterprise security testing needs, consider professional penetration testing services.</p>
+                    `
+                },
+                'community': {
+                    title: 'Community',
+                    content: `
+                        <h3>Security Community</h3>
+                        <p>CyberInject is built by and for the ethical security testing community.</p>
+                        <p><strong>Join the Community:</strong></p>
+                        <p>• Share responsible security research findings</p>
+                        <p>• Contribute to improving web application security</p>
+                        <p>• Follow ethical hacking best practices</p>
+                        <p>• Participate in coordinated vulnerability disclosure</p>
+                        <p><strong>Professional Resources:</strong></p>
+                        <p>• OWASP Testing Guide</p>
+                        <p>• CVE Database</p>
+                        <p>• Security conferences and training</p>
+                        <p>• Bug bounty platforms</p>
+                        <p><strong>Remember:</strong> Always obtain proper authorization before testing any system.</p>
+                    `
+                }
+            };
+            
+            if (content[type]) {
+                modalBody.innerHTML = content[type].content;
+                modal.style.display = 'block';
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
