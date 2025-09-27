@@ -5,25 +5,39 @@ class CyberInject {
   }
 
   async init() {
+    // Apply size constraints as the very first thing
+    this.addDynamicStyles();
+    
     await this.loadCustomPayloads();
     this.setupTabNavigation();
     this.setupPayloadCopy();
     this.setupKeyboardShortcuts();
     this.setupSettings();
-    this.updatePayloadCounts();
     this.renderCustomPayloads();
-    this.addDynamicStyles();
+    this.updatePayloadCounts();
   }
 
   addDynamicStyles() {
     var style = document.createElement('style');
     style.textContent = `
+      body {
+        width: 380px !important;
+        height: 500px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+      }
+
       .extension-container {
         width: 380px !important;
         height: 500px !important;
+        min-width: 380px !important;
+        max-width: 380px !important;
         min-height: 500px !important;
         max-height: 500px !important;
         overflow: hidden !important;
+        box-sizing: border-box !important;
+        position: relative !important;
       }
 
       .header-controls {
@@ -462,6 +476,11 @@ class CyberInject {
     
     document.getElementById('payloadFormOverlay').reset();
     this.renderCustomPayloadsOverlay();
+    
+    // Update the main interface immediately
+    this.renderCustomPayloads();
+    this.updatePayloadCounts();
+    
     this.showTemporaryMessage('Added custom payload: ' + name, 'success');
   }
 
@@ -507,6 +526,11 @@ class CyberInject {
     });
     await this.saveCustomPayloads();
     this.renderCustomPayloadsOverlay();
+    
+    // Update the main interface immediately
+    this.renderCustomPayloads();
+    this.updatePayloadCounts();
+    
     this.showTemporaryMessage('Custom payload deleted', 'success');
   }
 
