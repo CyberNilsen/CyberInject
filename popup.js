@@ -439,6 +439,8 @@ class CyberInject {
     this.renderCustomPayloadsOverlay();
   }
 
+    
+
   hideSettingsOverlay() {
     var overlay = document.getElementById('settingsOverlay');
     
@@ -966,6 +968,29 @@ document.addEventListener('DOMContentLoaded', function() {
     var stats = cyberInject.getStats();
     console.log('📊 Extension Stats:', stats);
   }, 1000);
+
+  const tabNav = document.querySelector('.tab-navigation');
+  if (tabNav) {
+      // Enable horizontal scroll with mouse wheel
+      tabNav.addEventListener('wheel', (e) => {
+          if (e.deltaY !== 0) {
+              e.preventDefault();
+              tabNav.scrollLeft += e.deltaY;
+          }
+      });
+      
+      // Update fade indicators
+      function updateFades() {
+          const isAtStart = tabNav.scrollLeft <= 1;
+          const isAtEnd = tabNav.scrollLeft >= tabNav.scrollWidth - tabNav.clientWidth - 1;
+          
+          tabNav.classList.toggle('show-left-fade', !isAtStart);
+          tabNav.classList.toggle('show-right-fade', !isAtEnd);
+      }
+      
+      tabNav.addEventListener('scroll', updateFades);
+      updateFades();
+  }
   
   window.cyberInject = cyberInject;
 });

