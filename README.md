@@ -170,7 +170,7 @@ cyberinject/
 - ✅ Chrome/Chromium (via Chrome Web Store)
 - ✅ Microsoft Edge (via Chrome Web Store)
 - ✅ Brave Browser (via Chrome Web Store)
-- ✅ Firefox (manual installation)
+- ✅ Firefox (via Firefox Web Store)
 - ✅ Safari (with manifest adjustments)
 
 ### Security Features
