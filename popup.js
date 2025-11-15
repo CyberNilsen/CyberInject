@@ -15,6 +15,7 @@ class CyberInject {
     this.setupSettings();
     this.setupTools();
     this.setupHistory();
+    this.setupSearch();
     this.renderCustomPayloads();
     this.updatePayloadCounts();
     this.setupScrollFades();
@@ -29,14 +30,12 @@ class CyberInject {
       const scrollWidth = tabNavigation.scrollWidth;
       const clientWidth = tabNavigation.clientWidth;
       
-      // Show left fade if scrolled right
       if (scrollLeft > 10) {
         tabNavigation.classList.add('fade-left');
       } else {
         tabNavigation.classList.remove('fade-left');
       }
       
-      // Show right fade if not scrolled all the way right
       if (scrollLeft < scrollWidth - clientWidth - 10) {
         tabNavigation.classList.add('fade-right');
       } else {
@@ -44,19 +43,261 @@ class CyberInject {
       }
     }
 
-    // Update on scroll
     tabNavigation.addEventListener('scroll', updateScrollFades);
 
-    // Update on page load and resize
     window.addEventListener('load', updateScrollFades);
     window.addEventListener('resize', updateScrollFades);
     
-    // Initial update
     setTimeout(updateScrollFades, 100);
   }
 
+  setupSearch() {
+    const contentArea = document.querySelector('.content-area');
+    const ethicsWarning = document.querySelector('.ethics-warning');
+    
+    console.log('Setting up search...', ethicsWarning);
+    
+    if (!ethicsWarning) {
+      console.warn('Ethics warning not found, trying alternative placement');
+      if (contentArea) {
+        const firstSection = contentArea.querySelector('.payload-section');
+        if (firstSection) {
+          const searchContainer = this.createSearchContainer();
+          contentArea.insertBefore(searchContainer, firstSection);
+          this.attachSearchListeners();
+          return;
+        }
+      }
+      console.error('Could not find suitable place for search bar');
+      return;
+    }
+
+    const searchContainer = this.createSearchContainer();
+    ethicsWarning.parentNode.insertBefore(searchContainer, ethicsWarning.nextSibling);
+    this.attachSearchListeners();
+  }
+
+  createSearchContainer() {
+    const searchContainer = document.createElement('div');
+    searchContainer.id = 'searchContainer';
+    searchContainer.style.cssText = `
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    `;
+
+    searchContainer.innerHTML = `
+      <span style="font-size: 16px;">🔍</span>
+      <input 
+        type="text" 
+        id="searchInput" 
+        placeholder="Search payloads..." 
+        style="
+          flex: 1;
+          border: none;
+          outline: none;
+          font-size: 13px;
+          color: #0f172a;
+          background: transparent;
+        "
+      />
+      <button id="clearSearch" style="
+        background: #f1f5f9;
+        border: none;
+        padding: 4px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 11px;
+        color: #64748b;
+        display: none;
+        font-weight: 500;
+      ">Clear</button>
+    `;
+
+    return searchContainer;
+  }
+
+  attachSearchListeners() {
+    const searchInput = document.getElementById('searchInput');
+    const clearSearchBtn = document.getElementById('clearSearch');
+
+    if (!searchInput) {
+      console.error('Search input not found');
+      return;
+    }
+
+    console.log('Search listeners attached');
+
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase().trim();
+      
+      if (query.length > 0) {
+        clearSearchBtn.style.display = 'block';
+        this.filterPayloads(query);
+      } else {
+        clearSearchBtn.style.display = 'none';
+        this.showAllPayloads();
+      }
+    });
+
+    if (clearSearchBtn) {
+      clearSearchBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        clearSearchBtn.style.display = 'none';
+        this.showAllPayloads();
+        searchInput.focus();
+      });
+    }
+
+    const tabButtons = document.querySelectorAll('.tab-button');
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        searchInput.value = '';
+        if (clearSearchBtn) clearSearchBtn.style.display = 'none';
+        this.showAllPayloads();
+      });
+    });
+  }
+
+  filterPayloads(query) {
+    const activeSection = document.querySelector('.payload-section.active');
+    if (!activeSection) return;
+
+    const sectionId = activeSection.id;
+
+    if (sectionId === 'tools') {
+      const toolCards = activeSection.querySelectorAll('.tool-card');
+      let visibleCount = 0;
+
+      toolCards.forEach(card => {
+        const title = card.querySelector('.tool-title').textContent.toLowerCase();
+        
+        if (title.includes(query)) {
+          card.style.display = '';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      this.showNoResultsMessage(activeSection, visibleCount, query, '.tools-grid');
+      return;
+    }
+
+    if (sectionId === 'reference') {
+      const refCards = activeSection.querySelectorAll('.reference-card');
+      let visibleCount = 0;
+
+      refCards.forEach(card => {
+        const title = card.querySelector('.reference-title').textContent.toLowerCase();
+        const content = card.querySelector('.reference-list').textContent.toLowerCase();
+        
+        if (title.includes(query) || content.includes(query)) {
+          card.style.display = '';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      this.showNoResultsMessage(activeSection, visibleCount, query, '.reference-grid');
+      return;
+    }
+
+    if (sectionId === 'history') {
+      const historyCards = activeSection.querySelectorAll('.payload-card');
+      let visibleCount = 0;
+
+      historyCards.forEach(card => {
+        const name = card.querySelector('.payload-name').textContent.toLowerCase();
+        const code = card.querySelector('.payload-code').textContent.toLowerCase();
+        const description = card.querySelector('.payload-description').textContent.toLowerCase();
+
+        if (name.includes(query) || code.includes(query) || description.includes(query)) {
+          card.style.display = '';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      this.showNoResultsMessage(activeSection, visibleCount, query, '#historyContainer');
+      return;
+    }
+
+    const payloadCards = activeSection.querySelectorAll('.payload-card');
+    let visibleCount = 0;
+
+    payloadCards.forEach(card => {
+      const name = card.querySelector('.payload-name').textContent.toLowerCase();
+      const code = card.querySelector('.payload-code').textContent.toLowerCase();
+      const description = card.querySelector('.payload-description').textContent.toLowerCase();
+
+      if (name.includes(query) || code.includes(query) || description.includes(query)) {
+        card.style.display = '';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    this.showNoResultsMessage(activeSection, visibleCount, query, '.payload-grid');
+  }
+
+  showNoResultsMessage(section, visibleCount, query, containerSelector) {
+    let noResultsMsg = section.querySelector('.no-results-message');
+    
+    if (visibleCount === 0) {
+      if (!noResultsMsg) {
+        noResultsMsg = document.createElement('div');
+        noResultsMsg.className = 'no-results-message';
+        noResultsMsg.style.cssText = `
+          text-align: center;
+          padding: 40px 20px;
+          color: #64748b;
+          font-size: 14px;
+        `;
+        noResultsMsg.innerHTML = `
+          <div style="font-size: 48px; margin-bottom: 12px; opacity: 0.5;">🔍</div>
+          <div>No results found matching "<strong>${this.escapeHtml(query)}</strong>"</div>
+        `;
+        const container = section.querySelector(containerSelector);
+        if (container) {
+          container.appendChild(noResultsMsg);
+        }
+      }
+    } else if (noResultsMsg) {
+      noResultsMsg.remove();
+    }
+  }
+
+  showAllPayloads() {
+    const allCards = document.querySelectorAll('.payload-card');
+    allCards.forEach(card => {
+      card.style.display = '';
+    });
+
+    const allToolCards = document.querySelectorAll('.tool-card');
+    allToolCards.forEach(card => {
+      card.style.display = '';
+    });
+
+    const allRefCards = document.querySelectorAll('.reference-card');
+    allRefCards.forEach(card => {
+      card.style.display = '';
+    });
+
+    const noResultsMessages = document.querySelectorAll('.no-results-message');
+    noResultsMessages.forEach(msg => msg.remove());
+  }
+
   setupTools() {
-    // URL Encode/Decode
     const urlEncode = document.getElementById('urlEncode');
     const urlDecode = document.getElementById('urlDecode');
     const urlInput = document.getElementById('urlInput');
@@ -87,7 +328,6 @@ class CyberInject {
       });
     }
 
-    // Base64 Encode/Decode
     const base64Encode = document.getElementById('base64Encode');
     const base64Decode = document.getElementById('base64Decode');
     const base64Input = document.getElementById('base64Input');
@@ -118,7 +358,6 @@ class CyberInject {
       });
     }
 
-    // HTML Entity Encode
     const htmlEncode = document.getElementById('htmlEncode');
     const htmlInput = document.getElementById('htmlInput');
     const htmlResult = document.getElementById('htmlResult');
@@ -133,7 +372,6 @@ class CyberInject {
       });
     }
 
-    // Hex Encode/Decode
     const hexEncode = document.getElementById('hexEncode');
     const hexDecode = document.getElementById('hexDecode');
     const hexInput = document.getElementById('hexInput');
@@ -172,7 +410,6 @@ class CyberInject {
       });
     }
 
-    // Payload Variation Generator
     const generateVariations = document.getElementById('generateVariations');
     const variationInput = document.getElementById('variationInput');
     const variationResult = document.getElementById('variationResult');
@@ -188,7 +425,6 @@ class CyberInject {
       });
     }
 
-    // Character Counter
     const countChars = document.getElementById('countChars');
     const counterInput = document.getElementById('counterInput');
     const counterResult = document.getElementById('counterResult');
@@ -223,23 +459,17 @@ class CyberInject {
   generatePayloadVariations(payload) {
     const variations = [];
     
-    // Original
     variations.push(payload);
     
-    // Case variations
     variations.push(payload.toUpperCase());
     variations.push(payload.toLowerCase());
     
-    // URL encoded
     variations.push(encodeURIComponent(payload));
     
-    // Double URL encoded
     variations.push(encodeURIComponent(encodeURIComponent(payload)));
     
-    // HTML entities
     variations.push(this.htmlEntityEncode(payload));
     
-    // With null bytes
     variations.push(payload + '%00');
     
     if (payload.includes("'") || payload.includes('"')) {
@@ -1065,7 +1295,6 @@ class CyberInject {
           });
         });
       } else {
-        // Fallback to localStorage for non-extension environments
         localStorage.setItem('cyberInjectCustomPayloads', JSON.stringify(this.customPayloads));
       }
       console.log('Saved custom payloads:', this.customPayloads);
@@ -1310,6 +1539,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const tabNav = document.querySelector('.tab-navigation');
   if (tabNav) {
+      // Enable horizontal scroll with mouse wheel
       tabNav.addEventListener('wheel', (e) => {
           if (e.deltaY !== 0) {
               e.preventDefault();
