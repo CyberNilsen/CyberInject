@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "CyberInject",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Professional security testing toolkit for ethical hackers and penetration testers",
   
   "icons": {
