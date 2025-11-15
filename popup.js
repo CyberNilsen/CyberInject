@@ -1,20 +1,625 @@
 class CyberInject {
   constructor() {
     this.customPayloads = [];
+    this.history = [];
     this.init();
   }
 
   async init() {
-    // Apply size constraints as the very first thing
     this.addDynamicStyles();
-    
     await this.loadCustomPayloads();
+    await this.loadHistory();
     this.setupTabNavigation();
     this.setupPayloadCopy();
     this.setupKeyboardShortcuts();
     this.setupSettings();
+    this.setupTools();
+    this.setupHistory();
     this.renderCustomPayloads();
     this.updatePayloadCounts();
+    this.setupScrollFades();
+    // Setup search after everything else is loaded
+    setTimeout(() => this.setupSearch(), 500);
+  }
+
+  setupScrollFades() {
+    const tabNavigation = document.querySelector('.tab-navigation');
+    if (!tabNavigation) return;
+
+    function updateScrollFades() {
+      const scrollLeft = tabNavigation.scrollLeft;
+      const scrollWidth = tabNavigation.scrollWidth;
+      const clientWidth = tabNavigation.clientWidth;
+      
+      // Show left fade if scrolled right
+      if (scrollLeft > 10) {
+        tabNavigation.classList.add('fade-left');
+      } else {
+        tabNavigation.classList.remove('fade-left');
+      }
+      
+      // Show right fade if not scrolled all the way right
+      if (scrollLeft < scrollWidth - clientWidth - 10) {
+        tabNavigation.classList.add('fade-right');
+      } else {
+        tabNavigation.classList.remove('fade-right');
+      }
+    }
+
+    // Update on scroll
+    tabNavigation.addEventListener('scroll', updateScrollFades);
+
+    // Update on page load and resize
+    window.addEventListener('load', updateScrollFades);
+    window.addEventListener('resize', updateScrollFades);
+    
+    // Initial update
+    setTimeout(updateScrollFades, 100);
+  }
+
+  setupSearch() {
+    // Create search bar and insert it after the ethics warning
+    const contentArea = document.querySelector('.content-area');
+    const ethicsWarning = document.querySelector('.ethics-warning');
+    
+    console.log('Setting up search...', ethicsWarning);
+    
+    if (!ethicsWarning) {
+      console.warn('Ethics warning not found, trying alternative placement');
+      // Alternative: insert at the beginning of content area
+      if (contentArea) {
+        const firstSection = contentArea.querySelector('.payload-section');
+        if (firstSection) {
+          const searchContainer = this.createSearchContainer();
+          contentArea.insertBefore(searchContainer, firstSection);
+          this.attachSearchListeners();
+          return;
+        }
+      }
+      console.error('Could not find suitable place for search bar');
+      return;
+    }
+
+    const searchContainer = this.createSearchContainer();
+    ethicsWarning.parentNode.insertBefore(searchContainer, ethicsWarning.nextSibling);
+    this.attachSearchListeners();
+  }
+
+  createSearchContainer() {
+    const searchContainer = document.createElement('div');
+    searchContainer.id = 'searchContainer';
+    searchContainer.style.cssText = `
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    `;
+
+    searchContainer.innerHTML = `
+      <span style="font-size: 16px;">🔍</span>
+      <input 
+        type="text" 
+        id="searchInput" 
+        placeholder="Search payloads..." 
+        style="
+          flex: 1;
+          border: none;
+          outline: none;
+          font-size: 13px;
+          color: #0f172a;
+          background: transparent;
+        "
+      />
+      <button id="clearSearch" style="
+        background: #f1f5f9;
+        border: none;
+        padding: 4px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 11px;
+        color: #64748b;
+        display: none;
+        font-weight: 500;
+      ">Clear</button>
+    `;
+
+    return searchContainer;
+  }
+
+  attachSearchListeners() {
+    const searchInput = document.getElementById('searchInput');
+    const clearSearchBtn = document.getElementById('clearSearch');
+
+    if (!searchInput) {
+      console.error('Search input not found');
+      return;
+    }
+
+    console.log('Search listeners attached');
+
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase().trim();
+      
+      if (query.length > 0) {
+        clearSearchBtn.style.display = 'block';
+        this.filterPayloads(query);
+      } else {
+        clearSearchBtn.style.display = 'none';
+        this.showAllPayloads();
+      }
+    });
+
+    if (clearSearchBtn) {
+      clearSearchBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        clearSearchBtn.style.display = 'none';
+        this.showAllPayloads();
+        searchInput.focus();
+      });
+    }
+
+    // Also clear search when switching tabs
+    const tabButtons = document.querySelectorAll('.tab-button');
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        searchInput.value = '';
+        if (clearSearchBtn) clearSearchBtn.style.display = 'none';
+        this.showAllPayloads();
+      });
+    });
+  }
+
+  filterPayloads(query) {
+    const activeSection = document.querySelector('.payload-section.active');
+    if (!activeSection) return;
+
+    const sectionId = activeSection.id;
+
+    // Handle Tools section
+    if (sectionId === 'tools') {
+      const toolCards = activeSection.querySelectorAll('.tool-card');
+      let visibleCount = 0;
+
+      toolCards.forEach(card => {
+        const title = card.querySelector('.tool-title').textContent.toLowerCase();
+        
+        if (title.includes(query)) {
+          card.style.display = '';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      this.showNoResultsMessage(activeSection, visibleCount, query, '.tools-grid');
+      return;
+    }
+
+    // Handle Reference section
+    if (sectionId === 'reference') {
+      const refCards = activeSection.querySelectorAll('.reference-card');
+      let visibleCount = 0;
+
+      refCards.forEach(card => {
+        const title = card.querySelector('.reference-title').textContent.toLowerCase();
+        const content = card.querySelector('.reference-list').textContent.toLowerCase();
+        
+        if (title.includes(query) || content.includes(query)) {
+          card.style.display = '';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      this.showNoResultsMessage(activeSection, visibleCount, query, '.reference-grid');
+      return;
+    }
+
+    // Handle History section
+    if (sectionId === 'history') {
+      const historyCards = activeSection.querySelectorAll('.payload-card');
+      let visibleCount = 0;
+
+      historyCards.forEach(card => {
+        const name = card.querySelector('.payload-name').textContent.toLowerCase();
+        const code = card.querySelector('.payload-code').textContent.toLowerCase();
+        const description = card.querySelector('.payload-description').textContent.toLowerCase();
+
+        if (name.includes(query) || code.includes(query) || description.includes(query)) {
+          card.style.display = '';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      this.showNoResultsMessage(activeSection, visibleCount, query, '#historyContainer');
+      return;
+    }
+
+    // Handle regular payload sections (XSS, SQLi, SSRF, LFI, Other)
+    const payloadCards = activeSection.querySelectorAll('.payload-card');
+    let visibleCount = 0;
+
+    payloadCards.forEach(card => {
+      const name = card.querySelector('.payload-name').textContent.toLowerCase();
+      const code = card.querySelector('.payload-code').textContent.toLowerCase();
+      const description = card.querySelector('.payload-description').textContent.toLowerCase();
+
+      if (name.includes(query) || code.includes(query) || description.includes(query)) {
+        card.style.display = '';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    this.showNoResultsMessage(activeSection, visibleCount, query, '.payload-grid');
+  }
+
+  showNoResultsMessage(section, visibleCount, query, containerSelector) {
+    let noResultsMsg = section.querySelector('.no-results-message');
+    
+    if (visibleCount === 0) {
+      if (!noResultsMsg) {
+        noResultsMsg = document.createElement('div');
+        noResultsMsg.className = 'no-results-message';
+        noResultsMsg.style.cssText = `
+          text-align: center;
+          padding: 40px 20px;
+          color: #64748b;
+          font-size: 14px;
+        `;
+        noResultsMsg.innerHTML = `
+          <div style="font-size: 48px; margin-bottom: 12px; opacity: 0.5;">🔍</div>
+          <div>No results found matching "<strong>${this.escapeHtml(query)}</strong>"</div>
+        `;
+        const container = section.querySelector(containerSelector);
+        if (container) {
+          container.appendChild(noResultsMsg);
+        }
+      }
+    } else if (noResultsMsg) {
+      noResultsMsg.remove();
+    }
+  }
+
+  showAllPayloads() {
+    // Show all payload cards
+    const allCards = document.querySelectorAll('.payload-card');
+    allCards.forEach(card => {
+      card.style.display = '';
+    });
+
+    // Show all tool cards
+    const allToolCards = document.querySelectorAll('.tool-card');
+    allToolCards.forEach(card => {
+      card.style.display = '';
+    });
+
+    // Show all reference cards
+    const allRefCards = document.querySelectorAll('.reference-card');
+    allRefCards.forEach(card => {
+      card.style.display = '';
+    });
+
+    // Remove "no results" messages
+    const noResultsMessages = document.querySelectorAll('.no-results-message');
+    noResultsMessages.forEach(msg => msg.remove());
+  }
+
+  setupTools() {
+    // URL Encode/Decode
+    const urlEncode = document.getElementById('urlEncode');
+    const urlDecode = document.getElementById('urlDecode');
+    const urlInput = document.getElementById('urlInput');
+    const urlResult = document.getElementById('urlResult');
+
+    if (urlEncode) {
+      urlEncode.addEventListener('click', () => {
+        const text = urlInput.value;
+        if (text) {
+          urlResult.textContent = encodeURIComponent(text);
+          urlResult.style.display = 'block';
+        }
+      });
+    }
+
+    if (urlDecode) {
+      urlDecode.addEventListener('click', () => {
+        const text = urlInput.value;
+        if (text) {
+          try {
+            urlResult.textContent = decodeURIComponent(text);
+            urlResult.style.display = 'block';
+          } catch (e) {
+            urlResult.textContent = 'Error: Invalid URL encoding';
+            urlResult.style.display = 'block';
+          }
+        }
+      });
+    }
+
+    // Base64 Encode/Decode
+    const base64Encode = document.getElementById('base64Encode');
+    const base64Decode = document.getElementById('base64Decode');
+    const base64Input = document.getElementById('base64Input');
+    const base64Result = document.getElementById('base64Result');
+
+    if (base64Encode) {
+      base64Encode.addEventListener('click', () => {
+        const text = base64Input.value;
+        if (text) {
+          base64Result.textContent = btoa(text);
+          base64Result.style.display = 'block';
+        }
+      });
+    }
+
+    if (base64Decode) {
+      base64Decode.addEventListener('click', () => {
+        const text = base64Input.value;
+        if (text) {
+          try {
+            base64Result.textContent = atob(text);
+            base64Result.style.display = 'block';
+          } catch (e) {
+            base64Result.textContent = 'Error: Invalid Base64 string';
+            base64Result.style.display = 'block';
+          }
+        }
+      });
+    }
+
+    // HTML Entity Encode
+    const htmlEncode = document.getElementById('htmlEncode');
+    const htmlInput = document.getElementById('htmlInput');
+    const htmlResult = document.getElementById('htmlResult');
+
+    if (htmlEncode) {
+      htmlEncode.addEventListener('click', () => {
+        const text = htmlInput.value;
+        if (text) {
+          htmlResult.textContent = this.htmlEntityEncode(text);
+          htmlResult.style.display = 'block';
+        }
+      });
+    }
+
+    // Hex Encode/Decode
+    const hexEncode = document.getElementById('hexEncode');
+    const hexDecode = document.getElementById('hexDecode');
+    const hexInput = document.getElementById('hexInput');
+    const hexResult = document.getElementById('hexResult');
+
+    if (hexEncode) {
+      hexEncode.addEventListener('click', () => {
+        const text = hexInput.value;
+        if (text) {
+          let hex = '';
+          for (let i = 0; i < text.length; i++) {
+            hex += text.charCodeAt(i).toString(16);
+          }
+          hexResult.textContent = hex;
+          hexResult.style.display = 'block';
+        }
+      });
+    }
+
+    if (hexDecode) {
+      hexDecode.addEventListener('click', () => {
+        const text = hexInput.value;
+        if (text) {
+          try {
+            let str = '';
+            for (let i = 0; i < text.length; i += 2) {
+              str += String.fromCharCode(parseInt(text.substr(i, 2), 16));
+            }
+            hexResult.textContent = str;
+            hexResult.style.display = 'block';
+          } catch (e) {
+            hexResult.textContent = 'Error: Invalid hex string';
+            hexResult.style.display = 'block';
+          }
+        }
+      });
+    }
+
+    // Payload Variation Generator
+    const generateVariations = document.getElementById('generateVariations');
+    const variationInput = document.getElementById('variationInput');
+    const variationResult = document.getElementById('variationResult');
+
+    if (generateVariations) {
+      generateVariations.addEventListener('click', () => {
+        const payload = variationInput.value;
+        if (payload) {
+          const variations = this.generatePayloadVariations(payload);
+          variationResult.innerHTML = variations.map(v => `<div style="margin-bottom: 8px;">${this.escapeHtml(v)}</div>`).join('');
+          variationResult.style.display = 'block';
+        }
+      });
+    }
+
+    // Character Counter
+    const countChars = document.getElementById('countChars');
+    const counterInput = document.getElementById('counterInput');
+    const counterResult = document.getElementById('counterResult');
+
+    if (countChars) {
+      countChars.addEventListener('click', () => {
+        const text = counterInput.value;
+        const chars = text.length;
+        const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+        const lines = text.split('\n').length;
+        
+        counterResult.innerHTML = `
+          <div>Characters: ${chars}</div>
+          <div>Words: ${words}</div>
+          <div>Lines: ${lines}</div>
+        `;
+        counterResult.style.display = 'block';
+      });
+    }
+  }
+
+  htmlEntityEncode(text) {
+    const textarea = document.createElement('textarea');
+    textarea.textContent = text;
+    return textarea.innerHTML.replace(/&/g, '&amp;')
+                              .replace(/</g, '&lt;')
+                              .replace(/>/g, '&gt;')
+                              .replace(/"/g, '&quot;')
+                              .replace(/'/g, '&#39;');
+  }
+
+  generatePayloadVariations(payload) {
+    const variations = [];
+    
+    // Original
+    variations.push(payload);
+    
+    // Case variations
+    variations.push(payload.toUpperCase());
+    variations.push(payload.toLowerCase());
+    
+    // URL encoded
+    variations.push(encodeURIComponent(payload));
+    
+    // Double URL encoded
+    variations.push(encodeURIComponent(encodeURIComponent(payload)));
+    
+    // HTML entities
+    variations.push(this.htmlEntityEncode(payload));
+    
+    // With null bytes
+    variations.push(payload + '%00');
+    
+    // With comments (if SQL-like)
+    if (payload.includes("'") || payload.includes('"')) {
+      variations.push(payload + '/**/');
+      variations.push(payload + '--');
+    }
+    
+    return variations;
+  }
+
+  setupHistory() {
+    const clearHistory = document.getElementById('clearHistory');
+    
+    if (clearHistory) {
+      clearHistory.addEventListener('click', () => {
+        if (confirm('Are you sure you want to clear all history?')) {
+          this.history = [];
+          this.saveHistory();
+          this.renderHistory();
+          this.showTemporaryMessage('History cleared', 'success');
+        }
+      });
+    }
+    
+    this.renderHistory();
+  }
+
+  addToHistory(payloadName, payloadCode) {
+    const historyItem = {
+      id: Date.now().toString(),
+      name: payloadName,
+      code: payloadCode,
+      timestamp: new Date().toISOString()
+    };
+    
+    this.history.unshift(historyItem);
+    
+    // Keep only last 50 items
+    if (this.history.length > 50) {
+      this.history = this.history.slice(0, 50);
+    }
+    
+    this.saveHistory();
+  }
+
+  async loadHistory() {
+    try {
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        const result = await new Promise((resolve) => {
+          chrome.storage.local.get(['payloadHistory'], (result) => {
+            resolve(result);
+          });
+        });
+        this.history = result.payloadHistory || [];
+      } else {
+        const stored = localStorage.getItem('cyberInjectHistory');
+        this.history = stored ? JSON.parse(stored) : [];
+      }
+    } catch (error) {
+      console.warn('Failed to load history:', error);
+      this.history = [];
+    }
+  }
+
+  async saveHistory() {
+    try {
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        await new Promise((resolve, reject) => {
+          chrome.storage.local.set({ payloadHistory: this.history }, () => {
+            if (chrome.runtime.lastError) {
+              reject(chrome.runtime.lastError);
+            } else {
+              resolve();
+            }
+          });
+        });
+      } else {
+        localStorage.setItem('cyberInjectHistory', JSON.stringify(this.history));
+      }
+    } catch (error) {
+      console.warn('Failed to save history:', error);
+    }
+  }
+
+  renderHistory() {
+    const historyContainer = document.getElementById('historyContainer');
+    if (!historyContainer) return;
+
+    if (this.history.length === 0) {
+      historyContainer.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">📋</div>
+          <div class="empty-state-text">No payloads tested yet. Start testing to see your history here.</div>
+        </div>
+      `;
+      return;
+    }
+
+    historyContainer.innerHTML = this.history.map(item => {
+      const date = new Date(item.timestamp);
+      const timeStr = date.toLocaleTimeString();
+      const dateStr = date.toLocaleDateString();
+      
+      return `
+        <div class="payload-card" data-payload="${this.escapeHtml(item.code)}" style="margin-bottom: 10px;">
+          <div class="payload-header">
+            <h3 class="payload-name">${this.escapeHtml(item.name)}</h3>
+            <div class="copy-button">📋</div>
+          </div>
+          <code class="payload-code">${this.escapeHtml(item.code)}</code>
+          <div class="payload-description">Used on ${dateStr} at ${timeStr}</div>
+        </div>
+      `;
+    }).join('');
+
+    // Setup click handlers for history items
+    const historyCards = historyContainer.querySelectorAll('.payload-card');
+    historyCards.forEach(card => {
+      this.setupPayloadCardEvents(card);
+    });
   }
 
   addDynamicStyles() {
@@ -439,6 +1044,8 @@ class CyberInject {
     this.renderCustomPayloadsOverlay();
   }
 
+    
+
   hideSettingsOverlay() {
     var overlay = document.getElementById('settingsOverlay');
     
@@ -654,6 +1261,9 @@ class CyberInject {
 
       self.copyToClipboard(payload).then(function() {
         self.showCopySuccess(card, copyButton, payloadName);
+        self.addToHistory(payloadName, payload);
+        // Immediately update history display if we're on the history tab
+        self.renderHistory();
         console.log('Copied payload: ' + payloadName);
       }).catch(function(error) {
         console.error('Copy failed:', error);
@@ -901,7 +1511,7 @@ class CyberInject {
         return;
       }
 
-      if (e.key >= '1' && e.key <= '5') {
+      if (e.key >= '1' && e.key <= '8') {
         var tabIndex = parseInt(e.key) - 1;
         var tabs = document.querySelectorAll('.tab-button');
         
@@ -952,7 +1562,8 @@ class CyberInject {
       totalPayloads: totalPayloads,
       categories: Object.keys(categoryStats).length,
       categoryStats: categoryStats,
-      customPayloads: this.customPayloads.length
+      customPayloads: this.customPayloads.length,
+      historyItems: this.history.length
     };
   }
 }
@@ -966,6 +1577,17 @@ document.addEventListener('DOMContentLoaded', function() {
     var stats = cyberInject.getStats();
     console.log('📊 Extension Stats:', stats);
   }, 1000);
+
+  const tabNav = document.querySelector('.tab-navigation');
+  if (tabNav) {
+      // Enable horizontal scroll with mouse wheel
+      tabNav.addEventListener('wheel', (e) => {
+          if (e.deltaY !== 0) {
+              e.preventDefault();
+              tabNav.scrollLeft += e.deltaY;
+          }
+      });
+  }
   
   window.cyberInject = cyberInject;
 });
