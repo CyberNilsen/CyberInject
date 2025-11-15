@@ -15,10 +15,11 @@ class CyberInject {
     this.setupSettings();
     this.setupTools();
     this.setupHistory();
-    this.setupSearch();
     this.renderCustomPayloads();
     this.updatePayloadCounts();
     this.setupScrollFades();
+    // Setup search after everything else is loaded
+    setTimeout(() => this.setupSearch(), 500);
   }
 
   setupScrollFades() {
@@ -30,12 +31,14 @@ class CyberInject {
       const scrollWidth = tabNavigation.scrollWidth;
       const clientWidth = tabNavigation.clientWidth;
       
+      // Show left fade if scrolled right
       if (scrollLeft > 10) {
         tabNavigation.classList.add('fade-left');
       } else {
         tabNavigation.classList.remove('fade-left');
       }
       
+      // Show right fade if not scrolled all the way right
       if (scrollLeft < scrollWidth - clientWidth - 10) {
         tabNavigation.classList.add('fade-right');
       } else {
@@ -43,15 +46,19 @@ class CyberInject {
       }
     }
 
+    // Update on scroll
     tabNavigation.addEventListener('scroll', updateScrollFades);
 
+    // Update on page load and resize
     window.addEventListener('load', updateScrollFades);
     window.addEventListener('resize', updateScrollFades);
     
+    // Initial update
     setTimeout(updateScrollFades, 100);
   }
 
   setupSearch() {
+    // Create search bar and insert it after the ethics warning
     const contentArea = document.querySelector('.content-area');
     const ethicsWarning = document.querySelector('.ethics-warning');
     
@@ -59,6 +66,7 @@ class CyberInject {
     
     if (!ethicsWarning) {
       console.warn('Ethics warning not found, trying alternative placement');
+      // Alternative: insert at the beginning of content area
       if (contentArea) {
         const firstSection = contentArea.querySelector('.payload-section');
         if (firstSection) {
@@ -155,6 +163,7 @@ class CyberInject {
       });
     }
 
+    // Also clear search when switching tabs
     const tabButtons = document.querySelectorAll('.tab-button');
     tabButtons.forEach(btn => {
       btn.addEventListener('click', () => {
@@ -171,6 +180,7 @@ class CyberInject {
 
     const sectionId = activeSection.id;
 
+    // Handle Tools section
     if (sectionId === 'tools') {
       const toolCards = activeSection.querySelectorAll('.tool-card');
       let visibleCount = 0;
@@ -190,6 +200,7 @@ class CyberInject {
       return;
     }
 
+    // Handle Reference section
     if (sectionId === 'reference') {
       const refCards = activeSection.querySelectorAll('.reference-card');
       let visibleCount = 0;
@@ -210,6 +221,7 @@ class CyberInject {
       return;
     }
 
+    // Handle History section
     if (sectionId === 'history') {
       const historyCards = activeSection.querySelectorAll('.payload-card');
       let visibleCount = 0;
@@ -231,6 +243,7 @@ class CyberInject {
       return;
     }
 
+    // Handle regular payload sections (XSS, SQLi, SSRF, LFI, Other)
     const payloadCards = activeSection.querySelectorAll('.payload-card');
     let visibleCount = 0;
 
@@ -278,26 +291,31 @@ class CyberInject {
   }
 
   showAllPayloads() {
+    // Show all payload cards
     const allCards = document.querySelectorAll('.payload-card');
     allCards.forEach(card => {
       card.style.display = '';
     });
 
+    // Show all tool cards
     const allToolCards = document.querySelectorAll('.tool-card');
     allToolCards.forEach(card => {
       card.style.display = '';
     });
 
+    // Show all reference cards
     const allRefCards = document.querySelectorAll('.reference-card');
     allRefCards.forEach(card => {
       card.style.display = '';
     });
 
+    // Remove "no results" messages
     const noResultsMessages = document.querySelectorAll('.no-results-message');
     noResultsMessages.forEach(msg => msg.remove());
   }
 
   setupTools() {
+    // URL Encode/Decode
     const urlEncode = document.getElementById('urlEncode');
     const urlDecode = document.getElementById('urlDecode');
     const urlInput = document.getElementById('urlInput');
@@ -328,6 +346,7 @@ class CyberInject {
       });
     }
 
+    // Base64 Encode/Decode
     const base64Encode = document.getElementById('base64Encode');
     const base64Decode = document.getElementById('base64Decode');
     const base64Input = document.getElementById('base64Input');
@@ -358,6 +377,7 @@ class CyberInject {
       });
     }
 
+    // HTML Entity Encode
     const htmlEncode = document.getElementById('htmlEncode');
     const htmlInput = document.getElementById('htmlInput');
     const htmlResult = document.getElementById('htmlResult');
@@ -372,6 +392,7 @@ class CyberInject {
       });
     }
 
+    // Hex Encode/Decode
     const hexEncode = document.getElementById('hexEncode');
     const hexDecode = document.getElementById('hexDecode');
     const hexInput = document.getElementById('hexInput');
@@ -410,6 +431,7 @@ class CyberInject {
       });
     }
 
+    // Payload Variation Generator
     const generateVariations = document.getElementById('generateVariations');
     const variationInput = document.getElementById('variationInput');
     const variationResult = document.getElementById('variationResult');
@@ -425,6 +447,7 @@ class CyberInject {
       });
     }
 
+    // Character Counter
     const countChars = document.getElementById('countChars');
     const counterInput = document.getElementById('counterInput');
     const counterResult = document.getElementById('counterResult');
@@ -459,19 +482,26 @@ class CyberInject {
   generatePayloadVariations(payload) {
     const variations = [];
     
+    // Original
     variations.push(payload);
     
+    // Case variations
     variations.push(payload.toUpperCase());
     variations.push(payload.toLowerCase());
     
+    // URL encoded
     variations.push(encodeURIComponent(payload));
     
+    // Double URL encoded
     variations.push(encodeURIComponent(encodeURIComponent(payload)));
     
+    // HTML entities
     variations.push(this.htmlEntityEncode(payload));
     
+    // With null bytes
     variations.push(payload + '%00');
     
+    // With comments (if SQL-like)
     if (payload.includes("'") || payload.includes('"')) {
       variations.push(payload + '/**/');
       variations.push(payload + '--');
@@ -507,6 +537,7 @@ class CyberInject {
     
     this.history.unshift(historyItem);
     
+    // Keep only last 50 items
     if (this.history.length > 50) {
       this.history = this.history.slice(0, 50);
     }
@@ -584,6 +615,7 @@ class CyberInject {
       `;
     }).join('');
 
+    // Setup click handlers for history items
     const historyCards = historyContainer.querySelectorAll('.payload-card');
     historyCards.forEach(card => {
       this.setupPayloadCardEvents(card);
@@ -919,6 +951,7 @@ class CyberInject {
   }
 
   showSettingsOverlay() {
+    // Create settings overlay that completely covers everything
     var settingsOverlay = document.createElement('div');
     settingsOverlay.id = 'settingsOverlay';
     settingsOverlay.style.cssText = `
@@ -981,8 +1014,10 @@ class CyberInject {
       </div>
     `;
 
+    // Add overlay to the extension container
     document.querySelector('.extension-container').appendChild(settingsOverlay);
 
+    // Set up event listeners
     var closeBtn = document.getElementById('closeSettingsOverlay');
     var cancelBtn = document.getElementById('cancelOverlay');
     var form = document.getElementById('payloadFormOverlay');
@@ -1018,6 +1053,7 @@ class CyberInject {
       overlay.remove();
     }
     
+    // Refresh the main interface to show new custom payloads
     this.renderCustomPayloads();
     this.updatePayloadCounts();
   }
@@ -1048,6 +1084,7 @@ class CyberInject {
     document.getElementById('payloadFormOverlay').reset();
     this.renderCustomPayloadsOverlay();
     
+    // Update the main interface immediately
     this.renderCustomPayloads();
     this.updatePayloadCounts();
     
@@ -1097,6 +1134,7 @@ class CyberInject {
     await this.saveCustomPayloads();
     this.renderCustomPayloadsOverlay();
     
+    // Update the main interface immediately
     this.renderCustomPayloads();
     this.updatePayloadCounts();
     
@@ -1224,6 +1262,7 @@ class CyberInject {
       self.copyToClipboard(payload).then(function() {
         self.showCopySuccess(card, copyButton, payloadName);
         self.addToHistory(payloadName, payload);
+        // Immediately update history display if we're on the history tab
         self.renderHistory();
         console.log('Copied payload: ' + payloadName);
       }).catch(function(error) {
@@ -1262,6 +1301,7 @@ class CyberInject {
         });
         this.customPayloads = result.customPayloads || [];
       } else {
+        // Fallback to localStorage for non-extension environments
         var stored = localStorage.getItem('cyberInjectCustomPayloads');
         this.customPayloads = stored ? JSON.parse(stored) : [];
       }
@@ -1295,6 +1335,7 @@ class CyberInject {
           });
         });
       } else {
+        // Fallback to localStorage for non-extension environments
         localStorage.setItem('cyberInjectCustomPayloads', JSON.stringify(this.customPayloads));
       }
       console.log('Saved custom payloads:', this.customPayloads);
