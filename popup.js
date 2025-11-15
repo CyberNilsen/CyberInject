@@ -1,20 +1,363 @@
 class CyberInject {
   constructor() {
     this.customPayloads = [];
+    this.history = [];
     this.init();
   }
 
   async init() {
-    // Apply size constraints as the very first thing
     this.addDynamicStyles();
-    
     await this.loadCustomPayloads();
+    await this.loadHistory();
     this.setupTabNavigation();
     this.setupPayloadCopy();
     this.setupKeyboardShortcuts();
     this.setupSettings();
+    this.setupTools();
+    this.setupHistory();
     this.renderCustomPayloads();
     this.updatePayloadCounts();
+    this.setupScrollFades();
+  }
+
+  setupScrollFades() {
+    const tabNavigation = document.querySelector('.tab-navigation');
+    if (!tabNavigation) return;
+
+    function updateScrollFades() {
+      const scrollLeft = tabNavigation.scrollLeft;
+      const scrollWidth = tabNavigation.scrollWidth;
+      const clientWidth = tabNavigation.clientWidth;
+      
+      // Show left fade if scrolled right
+      if (scrollLeft > 10) {
+        tabNavigation.classList.add('fade-left');
+      } else {
+        tabNavigation.classList.remove('fade-left');
+      }
+      
+      // Show right fade if not scrolled all the way right
+      if (scrollLeft < scrollWidth - clientWidth - 10) {
+        tabNavigation.classList.add('fade-right');
+      } else {
+        tabNavigation.classList.remove('fade-right');
+      }
+    }
+
+    // Update on scroll
+    tabNavigation.addEventListener('scroll', updateScrollFades);
+
+    // Update on page load and resize
+    window.addEventListener('load', updateScrollFades);
+    window.addEventListener('resize', updateScrollFades);
+    
+    // Initial update
+    setTimeout(updateScrollFades, 100);
+  }
+
+  setupTools() {
+    // URL Encode/Decode
+    const urlEncode = document.getElementById('urlEncode');
+    const urlDecode = document.getElementById('urlDecode');
+    const urlInput = document.getElementById('urlInput');
+    const urlResult = document.getElementById('urlResult');
+
+    if (urlEncode) {
+      urlEncode.addEventListener('click', () => {
+        const text = urlInput.value;
+        if (text) {
+          urlResult.textContent = encodeURIComponent(text);
+          urlResult.style.display = 'block';
+        }
+      });
+    }
+
+    if (urlDecode) {
+      urlDecode.addEventListener('click', () => {
+        const text = urlInput.value;
+        if (text) {
+          try {
+            urlResult.textContent = decodeURIComponent(text);
+            urlResult.style.display = 'block';
+          } catch (e) {
+            urlResult.textContent = 'Error: Invalid URL encoding';
+            urlResult.style.display = 'block';
+          }
+        }
+      });
+    }
+
+    // Base64 Encode/Decode
+    const base64Encode = document.getElementById('base64Encode');
+    const base64Decode = document.getElementById('base64Decode');
+    const base64Input = document.getElementById('base64Input');
+    const base64Result = document.getElementById('base64Result');
+
+    if (base64Encode) {
+      base64Encode.addEventListener('click', () => {
+        const text = base64Input.value;
+        if (text) {
+          base64Result.textContent = btoa(text);
+          base64Result.style.display = 'block';
+        }
+      });
+    }
+
+    if (base64Decode) {
+      base64Decode.addEventListener('click', () => {
+        const text = base64Input.value;
+        if (text) {
+          try {
+            base64Result.textContent = atob(text);
+            base64Result.style.display = 'block';
+          } catch (e) {
+            base64Result.textContent = 'Error: Invalid Base64 string';
+            base64Result.style.display = 'block';
+          }
+        }
+      });
+    }
+
+    // HTML Entity Encode
+    const htmlEncode = document.getElementById('htmlEncode');
+    const htmlInput = document.getElementById('htmlInput');
+    const htmlResult = document.getElementById('htmlResult');
+
+    if (htmlEncode) {
+      htmlEncode.addEventListener('click', () => {
+        const text = htmlInput.value;
+        if (text) {
+          htmlResult.textContent = this.htmlEntityEncode(text);
+          htmlResult.style.display = 'block';
+        }
+      });
+    }
+
+    // Hex Encode/Decode
+    const hexEncode = document.getElementById('hexEncode');
+    const hexDecode = document.getElementById('hexDecode');
+    const hexInput = document.getElementById('hexInput');
+    const hexResult = document.getElementById('hexResult');
+
+    if (hexEncode) {
+      hexEncode.addEventListener('click', () => {
+        const text = hexInput.value;
+        if (text) {
+          let hex = '';
+          for (let i = 0; i < text.length; i++) {
+            hex += text.charCodeAt(i).toString(16);
+          }
+          hexResult.textContent = hex;
+          hexResult.style.display = 'block';
+        }
+      });
+    }
+
+    if (hexDecode) {
+      hexDecode.addEventListener('click', () => {
+        const text = hexInput.value;
+        if (text) {
+          try {
+            let str = '';
+            for (let i = 0; i < text.length; i += 2) {
+              str += String.fromCharCode(parseInt(text.substr(i, 2), 16));
+            }
+            hexResult.textContent = str;
+            hexResult.style.display = 'block';
+          } catch (e) {
+            hexResult.textContent = 'Error: Invalid hex string';
+            hexResult.style.display = 'block';
+          }
+        }
+      });
+    }
+
+    // Payload Variation Generator
+    const generateVariations = document.getElementById('generateVariations');
+    const variationInput = document.getElementById('variationInput');
+    const variationResult = document.getElementById('variationResult');
+
+    if (generateVariations) {
+      generateVariations.addEventListener('click', () => {
+        const payload = variationInput.value;
+        if (payload) {
+          const variations = this.generatePayloadVariations(payload);
+          variationResult.innerHTML = variations.map(v => `<div style="margin-bottom: 8px;">${this.escapeHtml(v)}</div>`).join('');
+          variationResult.style.display = 'block';
+        }
+      });
+    }
+
+    // Character Counter
+    const countChars = document.getElementById('countChars');
+    const counterInput = document.getElementById('counterInput');
+    const counterResult = document.getElementById('counterResult');
+
+    if (countChars) {
+      countChars.addEventListener('click', () => {
+        const text = counterInput.value;
+        const chars = text.length;
+        const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+        const lines = text.split('\n').length;
+        
+        counterResult.innerHTML = `
+          <div>Characters: ${chars}</div>
+          <div>Words: ${words}</div>
+          <div>Lines: ${lines}</div>
+        `;
+        counterResult.style.display = 'block';
+      });
+    }
+  }
+
+  htmlEntityEncode(text) {
+    const textarea = document.createElement('textarea');
+    textarea.textContent = text;
+    return textarea.innerHTML.replace(/&/g, '&amp;')
+                              .replace(/</g, '&lt;')
+                              .replace(/>/g, '&gt;')
+                              .replace(/"/g, '&quot;')
+                              .replace(/'/g, '&#39;');
+  }
+
+  generatePayloadVariations(payload) {
+    const variations = [];
+    
+    // Original
+    variations.push(payload);
+    
+    // Case variations
+    variations.push(payload.toUpperCase());
+    variations.push(payload.toLowerCase());
+    
+    // URL encoded
+    variations.push(encodeURIComponent(payload));
+    
+    // Double URL encoded
+    variations.push(encodeURIComponent(encodeURIComponent(payload)));
+    
+    // HTML entities
+    variations.push(this.htmlEntityEncode(payload));
+    
+    // With null bytes
+    variations.push(payload + '%00');
+    
+    if (payload.includes("'") || payload.includes('"')) {
+      variations.push(payload + '/**/');
+      variations.push(payload + '--');
+    }
+    
+    return variations;
+  }
+
+  setupHistory() {
+    const clearHistory = document.getElementById('clearHistory');
+    
+    if (clearHistory) {
+      clearHistory.addEventListener('click', () => {
+        if (confirm('Are you sure you want to clear all history?')) {
+          this.history = [];
+          this.saveHistory();
+          this.renderHistory();
+          this.showTemporaryMessage('History cleared', 'success');
+        }
+      });
+    }
+    
+    this.renderHistory();
+  }
+
+  addToHistory(payloadName, payloadCode) {
+    const historyItem = {
+      id: Date.now().toString(),
+      name: payloadName,
+      code: payloadCode,
+      timestamp: new Date().toISOString()
+    };
+    
+    this.history.unshift(historyItem);
+    
+    if (this.history.length > 50) {
+      this.history = this.history.slice(0, 50);
+    }
+    
+    this.saveHistory();
+  }
+
+  async loadHistory() {
+    try {
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        const result = await new Promise((resolve) => {
+          chrome.storage.local.get(['payloadHistory'], (result) => {
+            resolve(result);
+          });
+        });
+        this.history = result.payloadHistory || [];
+      } else {
+        const stored = localStorage.getItem('cyberInjectHistory');
+        this.history = stored ? JSON.parse(stored) : [];
+      }
+    } catch (error) {
+      console.warn('Failed to load history:', error);
+      this.history = [];
+    }
+  }
+
+  async saveHistory() {
+    try {
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        await new Promise((resolve, reject) => {
+          chrome.storage.local.set({ payloadHistory: this.history }, () => {
+            if (chrome.runtime.lastError) {
+              reject(chrome.runtime.lastError);
+            } else {
+              resolve();
+            }
+          });
+        });
+      } else {
+        localStorage.setItem('cyberInjectHistory', JSON.stringify(this.history));
+      }
+    } catch (error) {
+      console.warn('Failed to save history:', error);
+    }
+  }
+
+  renderHistory() {
+    const historyContainer = document.getElementById('historyContainer');
+    if (!historyContainer) return;
+
+    if (this.history.length === 0) {
+      historyContainer.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">📋</div>
+          <div class="empty-state-text">No payloads tested yet. Start testing to see your history here.</div>
+        </div>
+      `;
+      return;
+    }
+
+    historyContainer.innerHTML = this.history.map(item => {
+      const date = new Date(item.timestamp);
+      const timeStr = date.toLocaleTimeString();
+      const dateStr = date.toLocaleDateString();
+      
+      return `
+        <div class="payload-card" data-payload="${this.escapeHtml(item.code)}" style="margin-bottom: 10px;">
+          <div class="payload-header">
+            <h3 class="payload-name">${this.escapeHtml(item.name)}</h3>
+            <div class="copy-button">📋</div>
+          </div>
+          <code class="payload-code">${this.escapeHtml(item.code)}</code>
+          <div class="payload-description">Used on ${dateStr} at ${timeStr}</div>
+        </div>
+      `;
+    }).join('');
+
+    const historyCards = historyContainer.querySelectorAll('.payload-card');
+    historyCards.forEach(card => {
+      this.setupPayloadCardEvents(card);
+    });
   }
 
   addDynamicStyles() {
@@ -346,7 +689,6 @@ class CyberInject {
   }
 
   showSettingsOverlay() {
-    // Create settings overlay that completely covers everything
     var settingsOverlay = document.createElement('div');
     settingsOverlay.id = 'settingsOverlay';
     settingsOverlay.style.cssText = `
@@ -409,10 +751,8 @@ class CyberInject {
       </div>
     `;
 
-    // Add overlay to the extension container
     document.querySelector('.extension-container').appendChild(settingsOverlay);
 
-    // Set up event listeners
     var closeBtn = document.getElementById('closeSettingsOverlay');
     var cancelBtn = document.getElementById('cancelOverlay');
     var form = document.getElementById('payloadFormOverlay');
@@ -448,7 +788,6 @@ class CyberInject {
       overlay.remove();
     }
     
-    // Refresh the main interface to show new custom payloads
     this.renderCustomPayloads();
     this.updatePayloadCounts();
   }
@@ -479,7 +818,6 @@ class CyberInject {
     document.getElementById('payloadFormOverlay').reset();
     this.renderCustomPayloadsOverlay();
     
-    // Update the main interface immediately
     this.renderCustomPayloads();
     this.updatePayloadCounts();
     
@@ -529,7 +867,6 @@ class CyberInject {
     await this.saveCustomPayloads();
     this.renderCustomPayloadsOverlay();
     
-    // Update the main interface immediately
     this.renderCustomPayloads();
     this.updatePayloadCounts();
     
@@ -656,6 +993,8 @@ class CyberInject {
 
       self.copyToClipboard(payload).then(function() {
         self.showCopySuccess(card, copyButton, payloadName);
+        self.addToHistory(payloadName, payload);
+        self.renderHistory();
         console.log('Copied payload: ' + payloadName);
       }).catch(function(error) {
         console.error('Copy failed:', error);
@@ -693,7 +1032,6 @@ class CyberInject {
         });
         this.customPayloads = result.customPayloads || [];
       } else {
-        // Fallback to localStorage for non-extension environments
         var stored = localStorage.getItem('cyberInjectCustomPayloads');
         this.customPayloads = stored ? JSON.parse(stored) : [];
       }
@@ -903,7 +1241,7 @@ class CyberInject {
         return;
       }
 
-      if (e.key >= '1' && e.key <= '5') {
+      if (e.key >= '1' && e.key <= '8') {
         var tabIndex = parseInt(e.key) - 1;
         var tabs = document.querySelectorAll('.tab-button');
         
@@ -954,7 +1292,8 @@ class CyberInject {
       totalPayloads: totalPayloads,
       categories: Object.keys(categoryStats).length,
       categoryStats: categoryStats,
-      customPayloads: this.customPayloads.length
+      customPayloads: this.customPayloads.length,
+      historyItems: this.history.length
     };
   }
 }
@@ -971,25 +1310,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const tabNav = document.querySelector('.tab-navigation');
   if (tabNav) {
-      // Enable horizontal scroll with mouse wheel
       tabNav.addEventListener('wheel', (e) => {
           if (e.deltaY !== 0) {
               e.preventDefault();
               tabNav.scrollLeft += e.deltaY;
           }
       });
-      
-      // Update fade indicators
-      function updateFades() {
-          const isAtStart = tabNav.scrollLeft <= 1;
-          const isAtEnd = tabNav.scrollLeft >= tabNav.scrollWidth - tabNav.clientWidth - 1;
-          
-          tabNav.classList.toggle('show-left-fade', !isAtStart);
-          tabNav.classList.toggle('show-right-fade', !isAtEnd);
-      }
-      
-      tabNav.addEventListener('scroll', updateFades);
-      updateFades();
   }
   
   window.cyberInject = cyberInject;

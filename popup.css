@@ -161,7 +161,7 @@ body {
   white-space: nowrap;
 }
 
-/* Tab Navigation */
+
 .tab-navigation {
   display: flex;
   background: var(--bg-secondary);
@@ -181,13 +181,14 @@ body {
   display: none;
 }
 
+/* Fade effects on edges */
 .tab-navigation::before,
 .tab-navigation::after {
   content: '';
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 20px;
+  width: 30px;
   pointer-events: none;
   z-index: 1;
   opacity: 0;
@@ -202,6 +203,15 @@ body {
 .tab-navigation::after {
   right: 0;
   background: linear-gradient(to left, var(--bg-secondary), transparent);
+}
+
+/* Show fades when scrollable */
+.tab-navigation.fade-left::before {
+  opacity: 1;
+}
+
+.tab-navigation.fade-right::after {
+  opacity: 1;
 }
 
 .tab-navigation.show-left-fade::before {
