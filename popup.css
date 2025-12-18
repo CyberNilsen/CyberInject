@@ -46,6 +46,11 @@
   box-sizing: border-box;
 }
 
+html, body {
+  background: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.5;
@@ -53,6 +58,11 @@ body {
   background: var(--bg-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  width: 380px !important;
+  height: 500px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
 }
 
 .extension-container {

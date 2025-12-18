@@ -18,8 +18,35 @@ class CyberInject {
     this.renderCustomPayloads();
     this.updatePayloadCounts();
     this.setupScrollFades();
-    // Setup search after everything else is loaded
+    this.fixScrolling();
     setTimeout(() => this.setupSearch(), 500);
+  }
+
+  fixScrolling() {
+    const contentArea = document.querySelector('.content-area');
+    const tabNavigation = document.querySelector('.tab-navigation');
+    
+    // Fix content area scrolling
+    if (contentArea) {
+      contentArea.addEventListener('wheel', (e) => {
+        // Only prevent default if we're scrolling within content
+        const isScrollable = contentArea.scrollHeight > contentArea.clientHeight;
+        if (isScrollable) {
+          e.stopPropagation();
+        }
+      }, { passive: true });
+    }
+    
+    // Fix tab navigation horizontal scrolling
+    if (tabNavigation) {
+      tabNavigation.addEventListener('wheel', (e) => {
+        // Allow horizontal scroll with vertical wheel
+        if (e.deltaY !== 0) {
+          e.preventDefault();
+          tabNavigation.scrollLeft += e.deltaY;
+        }
+      }, { passive: false });
+    }
   }
 
   setupScrollFades() {
@@ -31,14 +58,12 @@ class CyberInject {
       const scrollWidth = tabNavigation.scrollWidth;
       const clientWidth = tabNavigation.clientWidth;
       
-      // Show left fade if scrolled right
       if (scrollLeft > 10) {
         tabNavigation.classList.add('fade-left');
       } else {
         tabNavigation.classList.remove('fade-left');
       }
       
-      // Show right fade if not scrolled all the way right
       if (scrollLeft < scrollWidth - clientWidth - 10) {
         tabNavigation.classList.add('fade-right');
       } else {
@@ -46,27 +71,17 @@ class CyberInject {
       }
     }
 
-    // Update on scroll
     tabNavigation.addEventListener('scroll', updateScrollFades);
-
-    // Update on page load and resize
     window.addEventListener('load', updateScrollFades);
     window.addEventListener('resize', updateScrollFades);
-    
-    // Initial update
     setTimeout(updateScrollFades, 100);
   }
 
   setupSearch() {
-    // Create search bar and insert it after the ethics warning
     const contentArea = document.querySelector('.content-area');
     const ethicsWarning = document.querySelector('.ethics-warning');
     
-    console.log('Setting up search...', ethicsWarning);
-    
     if (!ethicsWarning) {
-      console.warn('Ethics warning not found, trying alternative placement');
-      // Alternative: insert at the beginning of content area
       if (contentArea) {
         const firstSection = contentArea.querySelector('.payload-section');
         if (firstSection) {
@@ -76,7 +91,6 @@ class CyberInject {
           return;
         }
       }
-      console.error('Could not find suitable place for search bar');
       return;
     }
 
@@ -135,12 +149,7 @@ class CyberInject {
     const searchInput = document.getElementById('searchInput');
     const clearSearchBtn = document.getElementById('clearSearch');
 
-    if (!searchInput) {
-      console.error('Search input not found');
-      return;
-    }
-
-    console.log('Search listeners attached');
+    if (!searchInput) return;
 
     searchInput.addEventListener('input', (e) => {
       const query = e.target.value.toLowerCase().trim();
@@ -163,7 +172,6 @@ class CyberInject {
       });
     }
 
-    // Also clear search when switching tabs
     const tabButtons = document.querySelectorAll('.tab-button');
     tabButtons.forEach(btn => {
       btn.addEventListener('click', () => {
@@ -180,7 +188,6 @@ class CyberInject {
 
     const sectionId = activeSection.id;
 
-    // Handle Tools section
     if (sectionId === 'tools') {
       const toolCards = activeSection.querySelectorAll('.tool-card');
       let visibleCount = 0;
@@ -200,7 +207,6 @@ class CyberInject {
       return;
     }
 
-    // Handle Reference section
     if (sectionId === 'reference') {
       const refCards = activeSection.querySelectorAll('.reference-card');
       let visibleCount = 0;
@@ -221,7 +227,6 @@ class CyberInject {
       return;
     }
 
-    // Handle History section
     if (sectionId === 'history') {
       const historyCards = activeSection.querySelectorAll('.payload-card');
       let visibleCount = 0;
@@ -243,7 +248,6 @@ class CyberInject {
       return;
     }
 
-    // Handle regular payload sections (XSS, SQLi, SSRF, LFI, Other)
     const payloadCards = activeSection.querySelectorAll('.payload-card');
     let visibleCount = 0;
 
@@ -291,25 +295,21 @@ class CyberInject {
   }
 
   showAllPayloads() {
-    // Show all payload cards
     const allCards = document.querySelectorAll('.payload-card');
     allCards.forEach(card => {
       card.style.display = '';
     });
 
-    // Show all tool cards
     const allToolCards = document.querySelectorAll('.tool-card');
     allToolCards.forEach(card => {
       card.style.display = '';
     });
 
-    // Show all reference cards
     const allRefCards = document.querySelectorAll('.reference-card');
     allRefCards.forEach(card => {
       card.style.display = '';
     });
 
-    // Remove "no results" messages
     const noResultsMessages = document.querySelectorAll('.no-results-message');
     noResultsMessages.forEach(msg => msg.remove());
   }
@@ -482,26 +482,14 @@ class CyberInject {
   generatePayloadVariations(payload) {
     const variations = [];
     
-    // Original
     variations.push(payload);
-    
-    // Case variations
     variations.push(payload.toUpperCase());
     variations.push(payload.toLowerCase());
-    
-    // URL encoded
     variations.push(encodeURIComponent(payload));
-    
-    // Double URL encoded
     variations.push(encodeURIComponent(encodeURIComponent(payload)));
-    
-    // HTML entities
     variations.push(this.htmlEntityEncode(payload));
-    
-    // With null bytes
     variations.push(payload + '%00');
     
-    // With comments (if SQL-like)
     if (payload.includes("'") || payload.includes('"')) {
       variations.push(payload + '/**/');
       variations.push(payload + '--');
@@ -537,7 +525,6 @@ class CyberInject {
     
     this.history.unshift(historyItem);
     
-    // Keep only last 50 items
     if (this.history.length > 50) {
       this.history = this.history.slice(0, 50);
     }
@@ -615,7 +602,6 @@ class CyberInject {
       `;
     }).join('');
 
-    // Setup click handlers for history items
     const historyCards = historyContainer.querySelectorAll('.payload-card');
     historyCards.forEach(card => {
       this.setupPayloadCardEvents(card);
@@ -669,252 +655,6 @@ class CyberInject {
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       }
 
-      .settings-modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(15, 23, 42, 0.8);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-        backdrop-filter: blur(8px);
-        opacity: 0;
-        transition: opacity 0.3s ease;
-      }
-
-      .settings-modal.active {
-        display: flex;
-        opacity: 1;
-      }
-
-      .settings-content {
-        background: #ffffff;
-        border-radius: 12px;
-        padding: 24px;
-        width: 90vw;
-        max-width: 500px;
-        max-height: 80vh;
-        overflow-y: auto;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-        transform: scale(0.95);
-        transition: transform 0.3s ease;
-      }
-
-      .settings-modal.active .settings-content {
-        transform: scale(1);
-      }
-
-      .settings-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 20px;
-        border-bottom: 2px solid #dc2626;
-        padding-bottom: 12px;
-      }
-
-      .settings-title {
-        font-size: 18px;
-        font-weight: 700;
-        color: #0f172a;
-      }
-
-      .close-button {
-        background: none;
-        border: none;
-        color: #64748b;
-        font-size: 20px;
-        cursor: pointer;
-        padding: 4px;
-        border-radius: 4px;
-        transition: all 0.2s ease;
-      }
-
-      .close-button:hover {
-        color: #dc2626;
-        background: #fef2f2;
-      }
-
-      .form-group {
-        margin-bottom: 16px;
-      }
-
-      .form-label {
-        display: block;
-        font-size: 12px;
-        font-weight: 600;
-        color: #0f172a;
-        margin-bottom: 6px;
-      }
-
-      .form-input, .form-select, .form-textarea {
-        width: 100%;
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 6px;
-        padding: 10px 12px;
-        color: #0f172a;
-        font-size: 13px;
-        box-sizing: border-box;
-        transition: all 0.2s ease;
-      }
-
-      .form-input:focus, .form-select:focus, .form-textarea:focus {
-        outline: none;
-        border-color: #dc2626;
-        background: #ffffff;
-        box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
-      }
-
-      .form-textarea {
-        resize: vertical;
-        min-height: 60px;
-        font-family: 'Monaco', 'Consolas', monospace;
-      }
-
-      .button-group {
-        display: flex;
-        gap: 8px;
-        margin-top: 20px;
-      }
-
-      .btn {
-        padding: 10px 16px;
-        border: none;
-        border-radius: 6px;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s ease;
-      }
-
-      .btn-primary {
-        background: #dc2626;
-        color: white;
-        border: none;
-      }
-
-      .btn-primary:hover {
-        background: #b91c1c;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
-      }
-
-      .btn-secondary {
-        background: #f8fafc;
-        color: #475569;
-        border: 1px solid #e2e8f0;
-      }
-
-      .btn-secondary:hover {
-        background: #f1f5f9;
-        border-color: #cbd5e1;
-      }
-
-      .custom-payloads-list {
-        margin-top: 20px;
-      }
-
-      .custom-payload-item {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 6px;
-        padding: 12px;
-        margin-bottom: 8px;
-        position: relative;
-        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        border-left: 3px solid #dc2626;
-      }
-
-      .custom-payload-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 8px;
-      }
-
-      .custom-payload-name {
-        font-size: 12px;
-        font-weight: 600;
-        color: #0f172a;
-      }
-
-      .delete-button {
-        background: #dc2626;
-        border: none;
-        color: white;
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 10px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-weight: 500;
-      }
-
-      .delete-button:hover {
-        background: #b91c1c;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 4px rgba(220, 38, 38, 0.4);
-      }
-
-      .custom-payload-code {
-        font-family: 'Monaco', 'Consolas', monospace;
-        font-size: 10px;
-        color: #06b6d4;
-        background: #0f172a;
-        padding: 8px 10px;
-        border-radius: 6px;
-        word-break: break-all;
-        border: 1px solid #1e293b;
-      }
-
-      .custom-payload {
-        border-left: 3px solid #dc2626;
-      }
-
-      .settings-section {
-        padding: 20px 0;
-        height: calc(100vh - 140px);
-        max-height: 400px;
-        overflow-y: auto;
-        box-sizing: border-box;
-      }
-
-      .settings-section .settings-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 20px;
-        border-bottom: 2px solid #dc2626;
-        padding-bottom: 12px;
-      }
-
-      .settings-section .settings-title {
-        font-size: 18px;
-        font-weight: 700;
-        color: #0f172a;
-      }
-
-      .settings-section .close-button {
-        background: none;
-        border: none;
-        color: #64748b;
-        font-size: 20px;
-        cursor: pointer;
-        padding: 4px;
-        border-radius: 4px;
-        transition: all 0.2s ease;
-      }
-
-      .settings-section .close-button:hover {
-        color: #dc2626;
-        background: #fef2f2;
-      }
-
       @keyframes slideInRight {
         from {
           transform: translateX(100%);
@@ -951,7 +691,6 @@ class CyberInject {
   }
 
   showSettingsOverlay() {
-    // Create settings overlay that completely covers everything
     var settingsOverlay = document.createElement('div');
     settingsOverlay.id = 'settingsOverlay';
     settingsOverlay.style.cssText = `
@@ -1008,19 +747,35 @@ class CyberInject {
         </div>
       </form>
 
+      <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #e2e8f0;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h3 style="color: #0f172a; font-size: 14px; margin: 0; font-weight: 600;">Import/Export</h3>
+        </div>
+        <div class="button-group" style="margin-bottom: 16px;">
+          <button type="button" class="btn btn-secondary" id="importPayloadsBtn" style="flex: 1;">
+            📥 Import
+          </button>
+          <button type="button" class="btn btn-secondary" id="exportPayloadsBtn" style="flex: 1;">
+            📤 Export
+          </button>
+        </div>
+        <input type="file" id="importFileInput" accept=".json" style="display: none;">
+      </div>
+
       <div class="custom-payloads-list">
         <h3 style="color: #0f172a; font-size: 14px; margin-bottom: 12px; font-weight: 600;">Your Custom Payloads</h3>
         <div id="customPayloadsContainerOverlay" style="max-height: 100px; overflow-y: auto; overflow-x: hidden;"></div>
       </div>
     `;
 
-    // Add overlay to the extension container
     document.querySelector('.extension-container').appendChild(settingsOverlay);
 
-    // Set up event listeners
     var closeBtn = document.getElementById('closeSettingsOverlay');
     var cancelBtn = document.getElementById('cancelOverlay');
     var form = document.getElementById('payloadFormOverlay');
+    var importBtn = document.getElementById('importPayloadsBtn');
+    var exportBtn = document.getElementById('exportPayloadsBtn');
+    var fileInput = document.getElementById('importFileInput');
 
     if (closeBtn) {
       closeBtn.addEventListener('click', function() {
@@ -1041,10 +796,221 @@ class CyberInject {
       }.bind(this));
     }
 
+    if (importBtn) {
+      importBtn.addEventListener('click', () => {
+        // For Firefox: Save state before opening file dialog
+        if (typeof browser !== 'undefined') {
+          // Firefox - use a different approach
+          this.showImportTextArea();
+        } else {
+          // Chrome - use file input
+          fileInput.click();
+        }
+      });
+    }
+
+    if (exportBtn) {
+      exportBtn.addEventListener('click', () => {
+        this.exportCustomPayloads();
+      });
+    }
+
+    if (fileInput) {
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          this.importCustomPayloads(file);
+        }
+      });
+    }
+
     this.renderCustomPayloadsOverlay();
   }
 
+  showImportTextArea() {
+    const overlay = document.getElementById('settingsOverlay');
+    if (!overlay) return;
+
+    // Create import text area modal
+    const importModal = document.createElement('div');
+    importModal.style.cssText = `
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10001;
+      padding: 20px;
+    `;
+
+    importModal.innerHTML = `
+      <div style="
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 20px;
+        width: 100%;
+        max-width: 340px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+      ">
+        <h3 style="margin: 0 0 12px 0; color: #0f172a; font-size: 16px;">Import Payloads</h3>
+        <p style="margin: 0 0 12px 0; color: #64748b; font-size: 12px;">Paste your JSON payloads below:</p>
+        <textarea id="importTextArea" style="
+          width: 100%;
+          height: 150px;
+          padding: 10px;
+          border: 1px solid #e2e8f0;
+          border-radius: 6px;
+          font-family: Monaco, monospace;
+          font-size: 11px;
+          resize: vertical;
+          margin-bottom: 12px;
+        " placeholder='[{"name":"Payload","category":"xss",...}]'></textarea>
+        <div style="display: flex; gap: 8px;">
+          <button id="importFromTextBtn" style="
+            flex: 1;
+            padding: 10px;
+            background: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+          ">Import</button>
+          <button id="cancelImportBtn" style="
+            flex: 1;
+            padding: 10px;
+            background: #f1f5f9;
+            color: #0f172a;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+          ">Cancel</button>
+        </div>
+      </div>
+    `;
+
+    overlay.appendChild(importModal);
+
+    const importFromTextBtn = importModal.querySelector('#importFromTextBtn');
+    const cancelImportBtn = importModal.querySelector('#cancelImportBtn');
+    const textArea = importModal.querySelector('#importTextArea');
+
+    importFromTextBtn.addEventListener('click', () => {
+      const jsonText = textArea.value.trim();
+      if (jsonText) {
+        this.importFromText(jsonText);
+        importModal.remove();
+      }
+    });
+
+    cancelImportBtn.addEventListener('click', () => {
+      importModal.remove();
+    });
+  }
+
+  async importFromText(jsonText) {
+    try {
+      const importedPayloads = JSON.parse(jsonText);
+      
+      if (!Array.isArray(importedPayloads)) {
+        throw new Error('Invalid format - must be an array');
+      }
+
+      let importedCount = 0;
+      for (const payload of importedPayloads) {
+        if (payload.name && payload.category && payload.code && payload.description) {
+          payload.id = Date.now().toString() + Math.random();
+          payload.custom = true;
+          this.customPayloads.push(payload);
+          importedCount++;
+        }
+      }
+
+      if (importedCount > 0) {
+        await this.saveCustomPayloads();
+        this.renderCustomPayloadsOverlay();
+        this.renderCustomPayloads();
+        this.updatePayloadCounts();
+        this.showTemporaryMessage(`Imported ${importedCount} payloads`, 'success');
+      } else {
+        this.showTemporaryMessage('No valid payloads found', 'error');
+      }
+    } catch (error) {
+      console.error('Import error:', error);
+      this.showTemporaryMessage('Invalid JSON format', 'error');
+    }
+  }
+
+  async exportCustomPayloads() {
+    if (this.customPayloads.length === 0) {
+      this.showTemporaryMessage('No custom payloads to export', 'error');
+      return;
+    }
+
+    const dataStr = JSON.stringify(this.customPayloads, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
     
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `cyberinject-payloads-${Date.now()}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    this.showTemporaryMessage(`Exported ${this.customPayloads.length} payloads`, 'success');
+  }
+
+  async importCustomPayloads(file) {
+    const reader = new FileReader();
+    
+    reader.onload = async (e) => {
+      try {
+        const importedPayloads = JSON.parse(e.target.result);
+        
+        if (!Array.isArray(importedPayloads)) {
+          throw new Error('Invalid file format');
+        }
+
+        let importedCount = 0;
+        for (const payload of importedPayloads) {
+          if (payload.name && payload.category && payload.code && payload.description) {
+            payload.id = Date.now().toString() + Math.random();
+            payload.custom = true;
+            this.customPayloads.push(payload);
+            importedCount++;
+          }
+        }
+
+        if (importedCount > 0) {
+          await this.saveCustomPayloads();
+          this.renderCustomPayloadsOverlay();
+          this.renderCustomPayloads();
+          this.updatePayloadCounts();
+          this.showTemporaryMessage(`Imported ${importedCount} payloads`, 'success');
+        } else {
+          this.showTemporaryMessage('No valid payloads found in file', 'error');
+        }
+      } catch (error) {
+        console.error('Import error:', error);
+        this.showTemporaryMessage('Failed to import payloads', 'error');
+      }
+    };
+
+    reader.onerror = () => {
+      this.showTemporaryMessage('Failed to read file', 'error');
+    };
+
+    reader.readAsText(file);
+  }
 
   hideSettingsOverlay() {
     var overlay = document.getElementById('settingsOverlay');
@@ -1053,7 +1019,6 @@ class CyberInject {
       overlay.remove();
     }
     
-    // Refresh the main interface to show new custom payloads
     this.renderCustomPayloads();
     this.updatePayloadCounts();
   }
@@ -1083,11 +1048,8 @@ class CyberInject {
     
     document.getElementById('payloadFormOverlay').reset();
     this.renderCustomPayloadsOverlay();
-    
-    // Update the main interface immediately
     this.renderCustomPayloads();
     this.updatePayloadCounts();
-    
     this.showTemporaryMessage('Added custom payload: ' + name, 'success');
   }
 
@@ -1106,13 +1068,42 @@ class CyberInject {
       var payload = this.customPayloads[i];
       var payloadItem = document.createElement('div');
       payloadItem.className = 'custom-payload-item';
+      payloadItem.style.cssText = `
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 12px;
+        margin-bottom: 8px;
+        position: relative;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        border-left: 3px solid #dc2626;
+      `;
       
       payloadItem.innerHTML = `
-        <div class="custom-payload-header">
-          <span class="custom-payload-name">${this.escapeHtml(payload.name)} (${payload.category.toUpperCase()})</span>
-          <button class="delete-button" data-id="${payload.id}">Delete</button>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+          <span style="font-size: 12px; font-weight: 600; color: #0f172a;">${this.escapeHtml(payload.name)} (${payload.category.toUpperCase()})</span>
+          <button class="delete-button" data-id="${payload.id}" style="
+            background: #dc2626;
+            border: none;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+          ">Delete</button>
         </div>
-        <div class="custom-payload-code">${this.escapeHtml(payload.code)}</div>
+        <div style="
+          font-family: 'Monaco', 'Consolas', monospace;
+          font-size: 10px;
+          color: #06b6d4;
+          background: #0f172a;
+          padding: 8px 10px;
+          border-radius: 6px;
+          word-break: break-all;
+          border: 1px solid #1e293b;
+        ">${this.escapeHtml(payload.code)}</div>
       `;
 
       var deleteBtn = payloadItem.querySelector('.delete-button');
@@ -1133,51 +1124,7 @@ class CyberInject {
     });
     await this.saveCustomPayloads();
     this.renderCustomPayloadsOverlay();
-    
-    // Update the main interface immediately
     this.renderCustomPayloads();
-    this.updatePayloadCounts();
-    
-    this.showTemporaryMessage('Custom payload deleted', 'success');
-  }
-
-  async addCustomPayload() {
-    var name = document.getElementById('payloadName').value.trim();
-    var category = document.getElementById('payloadCategory').value;
-    var code = document.getElementById('payloadCode').value.trim();
-    var description = document.getElementById('payloadDescription').value.trim();
-
-    if (!name || !category || !code || !description) {
-      this.showTemporaryMessage('Please fill in all fields', 'error');
-      return;
-    }
-
-    var payload = {
-      id: Date.now().toString(),
-      name: name,
-      category: category,
-      code: code,
-      description: description,
-      custom: true
-    };
-
-    this.customPayloads.push(payload);
-    await this.saveCustomPayloads();
-    this.renderCustomPayloads();
-    this.updatePayloadCounts();
-    
-    document.getElementById('payloadForm').reset();
-    this.renderCustomPayloadsInSettings();
-    this.showTemporaryMessage('Added custom payload: ' + name, 'success');
-  }
-
-  async deleteCustomPayload(id) {
-    this.customPayloads = this.customPayloads.filter(function(payload) {
-      return payload.id !== id;
-    });
-    await this.saveCustomPayloads();
-    this.renderCustomPayloads();
-    this.renderCustomPayloadsInSettings();
     this.updatePayloadCounts();
     this.showTemporaryMessage('Custom payload deleted', 'success');
   }
@@ -1199,6 +1146,7 @@ class CyberInject {
       payloadCard.className = 'payload-card custom-payload';
       payloadCard.setAttribute('data-payload', payload.code);
       payloadCard.setAttribute('data-custom-id', payload.id);
+      payloadCard.style.borderLeft = '3px solid #dc2626';
       
       payloadCard.innerHTML = `
         <div class="payload-header">
@@ -1214,42 +1162,6 @@ class CyberInject {
     }
   }
 
-  renderCustomPayloadsInSettings() {
-    var container = document.getElementById('customPayloadsContainer');
-    if (!container) return;
-
-    container.innerHTML = '';
-
-    if (this.customPayloads.length === 0) {
-      container.innerHTML = '<p style="color: #64748b; font-size: 12px; text-align: center; padding: 20px;">No custom payloads yet. Add your first one above!</p>';
-      return;
-    }
-
-    for (var i = 0; i < this.customPayloads.length; i++) {
-      var payload = this.customPayloads[i];
-      var payloadItem = document.createElement('div');
-      payloadItem.className = 'custom-payload-item';
-      
-      payloadItem.innerHTML = `
-        <div class="custom-payload-header">
-          <span class="custom-payload-name">${this.escapeHtml(payload.name)} (${payload.category.toUpperCase()})</span>
-          <button class="delete-button" data-id="${payload.id}">Delete</button>
-        </div>
-        <div class="custom-payload-code">${this.escapeHtml(payload.code)}</div>
-      `;
-
-      var deleteBtn = payloadItem.querySelector('.delete-button');
-      deleteBtn.addEventListener('click', function(e) {
-        var id = e.target.getAttribute('data-id');
-        if (confirm('Are you sure you want to delete this custom payload?')) {
-          this.deleteCustomPayload(id);
-        }
-      }.bind(this));
-
-      container.appendChild(payloadItem);
-    }
-  }
-
   setupPayloadCardEvents(card) {
     var self = this;
     card.addEventListener('click', function(e) {
@@ -1262,7 +1174,6 @@ class CyberInject {
       self.copyToClipboard(payload).then(function() {
         self.showCopySuccess(card, copyButton, payloadName);
         self.addToHistory(payloadName, payload);
-        // Immediately update history display if we're on the history tab
         self.renderHistory();
         console.log('Copied payload: ' + payloadName);
       }).catch(function(error) {
@@ -1301,7 +1212,6 @@ class CyberInject {
         });
         this.customPayloads = result.customPayloads || [];
       } else {
-        // Fallback to localStorage for non-extension environments
         var stored = localStorage.getItem('cyberInjectCustomPayloads');
         this.customPayloads = stored ? JSON.parse(stored) : [];
       }
@@ -1335,7 +1245,6 @@ class CyberInject {
           });
         });
       } else {
-        // Fallback to localStorage for non-extension environments
         localStorage.setItem('cyberInjectCustomPayloads', JSON.stringify(this.customPayloads));
       }
       console.log('Saved custom payloads:', this.customPayloads);
@@ -1354,7 +1263,6 @@ class CyberInject {
   setupTabNavigation() {
     var tabButtons = document.querySelectorAll('.tab-button');
     var payloadSections = document.querySelectorAll('.payload-section');
-    var self = this;
 
     for (var i = 0; i < tabButtons.length; i++) {
       tabButtons[i].addEventListener('click', function(e) {
@@ -1443,7 +1351,6 @@ class CyberInject {
   }
 
   showCopySuccess(card, copyButton, payloadName) {
-    var self = this;
     card.classList.add('copied');
     
     copyButton.textContent = '✅';
@@ -1459,7 +1366,6 @@ class CyberInject {
   }
 
   showCopyError(card, copyButton) {
-    var self = this;
     card.style.borderColor = '#ef4444';
     copyButton.textContent = '❌';
     
@@ -1505,7 +1411,6 @@ class CyberInject {
   }
 
   setupKeyboardShortcuts() {
-    var self = this;
     document.addEventListener('keydown', function(e) {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
         return;
@@ -1521,12 +1426,12 @@ class CyberInject {
       }
 
       if (e.key === 'Escape') {
-        var modal = document.getElementById('settingsModal');
-        if (modal && modal.classList.contains('active')) {
-          modal.classList.remove('active');
+        var overlay = document.getElementById('settingsOverlay');
+        if (overlay) {
+          this.hideSettingsOverlay();
         }
       }
-    });
+    }.bind(this));
   }
 
   updatePayloadCounts() {
@@ -1577,17 +1482,6 @@ document.addEventListener('DOMContentLoaded', function() {
     var stats = cyberInject.getStats();
     console.log('📊 Extension Stats:', stats);
   }, 1000);
-
-  const tabNav = document.querySelector('.tab-navigation');
-  if (tabNav) {
-      // Enable horizontal scroll with mouse wheel
-      tabNav.addEventListener('wheel', (e) => {
-          if (e.deltaY !== 0) {
-              e.preventDefault();
-              tabNav.scrollLeft += e.deltaY;
-          }
-      });
-  }
   
   window.cyberInject = cyberInject;
 });
