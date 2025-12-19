@@ -670,6 +670,11 @@ body {
   color: var(--text-primary);
 }
 
+.settings-close-button:hover {
+  background: #fac5c5 !important;
+  color: #a03c3c !important;
+}
+
 .form-group {
   margin-bottom: 16px;
 }

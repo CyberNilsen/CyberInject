@@ -707,10 +707,10 @@ class CyberInject {
       overflow-x: hidden;
     `;
 
-    settingsOverlay.innerHTML = `
-      <div class="settings-header">
-        <h2 class="settings-title">Custom Payloads</h2>
-        <button class="close-button" id="closeSettingsOverlay">&times;</button>
+     settingsOverlay.innerHTML = `
+      <div class="modal-header" style="border-bottom: 2px solid #ef4444;">
+        <h2 class="modal-title">Custom Payloads</h2>
+        <button class="close-button settings-close-button" id="closeSettingsOverlay">&times;</button>
       </div>
 
       <form id="payloadFormOverlay">
