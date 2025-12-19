@@ -655,9 +655,15 @@ body {
   transition: all 0.2s ease;
 }
 
+
 .close-button:hover {
   background: var(--bg-tertiary);
   color: var(--text-primary);
+}
+
+.settings-close-button:hover {
+  background: #fac5c5 !important;
+  color: #a03c3c !important;
 }
 
 .form-group {
