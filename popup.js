@@ -1283,27 +1283,41 @@ class CyberInject {
   }
 
   setupKeyboardShortcuts() {
-    document.addEventListener('keydown', function(e) {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+    document.addEventListener('keydown', (e) => {
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+
+      if (e.key === 'Escape') {
+        const overlay = document.getElementById('settingsOverlay');
+        if (overlay) {
+          this.hideSettingsOverlay();
+        }
+        return;
+      }
+
+      const tag = e.target.tagName;
+      if (
+        tag === 'INPUT' ||
+        tag === 'TEXTAREA' ||
+        tag === 'BUTTON' ||
+        tag === 'SELECT'
+      ) {
         return;
       }
 
       if (e.key >= '1' && e.key <= '8') {
-        var tabIndex = parseInt(e.key) - 1;
-        var tabs = document.querySelectorAll('.tab-button');
-        
+        const tabIndex = parseInt(e.key) - 1;
+        const tabs = document.querySelectorAll('.tab-button');
+
         if (tabs[tabIndex]) {
           tabs[tabIndex].click();
         }
       }
-
-      if (e.key === 'Escape') {
-        var overlay = document.getElementById('settingsOverlay');
-        if (overlay) {
-          this.hideSettingsOverlay();
-        }
-      }
-    }.bind(this));
+    });
   }
 
   updatePayloadCounts() {
