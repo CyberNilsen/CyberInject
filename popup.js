@@ -752,14 +752,14 @@ class CyberInject {
           <h3 style="color: #0f172a; font-size: 14px; margin: 0; font-weight: 600;">Import/Export</h3>
         </div>
         <div class="button-group" style="margin-bottom: 16px;">
-          <label class="btn btn-secondary" style="flex: 1; text-align: center; cursor: pointer; margin: 0;">
+          <button type="button" class="btn btn-secondary" id="importPayloadsBtn" style="flex: 1;">
             📥 Import
-            <input type="file" id="importFileInput" accept=".json" style="display: none;">
-          </label>
+          </button>
           <button type="button" class="btn btn-secondary" id="exportPayloadsBtn" style="flex: 1;">
             📤 Export
           </button>
         </div>
+        <input type="file" id="importFileInput" accept=".json" style="display: none;">
       </div>
 
       <div class="custom-payloads-list">
@@ -773,6 +773,7 @@ class CyberInject {
     var closeBtn = document.getElementById('closeSettingsOverlay');
     var cancelBtn = document.getElementById('cancelOverlay');
     var form = document.getElementById('payloadFormOverlay');
+    var importBtn = document.getElementById('importPayloadsBtn');
     var exportBtn = document.getElementById('exportPayloadsBtn');
     var fileInput = document.getElementById('importFileInput');
 
@@ -793,6 +794,12 @@ class CyberInject {
         e.preventDefault();
         this.addCustomPayloadOverlay();
       }.bind(this));
+    }
+
+    if (importBtn) {
+      importBtn.addEventListener('click', () => {
+        fileInput.click();
+      });
     }
 
     if (exportBtn) {
