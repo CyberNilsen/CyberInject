@@ -752,14 +752,34 @@ class CyberInject {
           <h3 style="color: #0f172a; font-size: 14px; margin: 0; font-weight: 600;">Import/Export</h3>
         </div>
         <div class="button-group" style="margin-bottom: 16px;">
-          <button type="button" class="btn btn-secondary" id="importPayloadsBtn" style="flex: 1;">
+          <button type="button" class="btn btn-secondary" id="showImportFormBtn" style="flex: 1;">
             📥 Import
           </button>
           <button type="button" class="btn btn-secondary" id="exportPayloadsBtn" style="flex: 1;">
             📤 Export
           </button>
         </div>
-        <input type="file" id="importFileInput" accept=".json" style="display: none;">
+        <div id="importFormContainer" style="display: none; margin-top: 12px;">
+          <textarea id="importJsonInput" placeholder="Paste your exported JSON here..." style="
+            width: 100%;
+            min-height: 80px;
+            padding: 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 11px;
+            resize: vertical;
+            box-sizing: border-box;
+          "></textarea>
+          <div class="button-group" style="margin-top: 8px; gap: 8px;">
+            <button type="button" class="btn btn-primary" id="confirmImportBtn" style="flex: 1;">
+              Import
+            </button>
+            <button type="button" class="btn btn-secondary" id="cancelImportBtn" style="flex: 1;">
+              Cancel
+            </button>
+          </div>
+        </div>
       </div>
 
       <div class="custom-payloads-list">
@@ -773,9 +793,12 @@ class CyberInject {
     var closeBtn = document.getElementById('closeSettingsOverlay');
     var cancelBtn = document.getElementById('cancelOverlay');
     var form = document.getElementById('payloadFormOverlay');
-    var importBtn = document.getElementById('importPayloadsBtn');
+    var showImportBtn = document.getElementById('showImportFormBtn');
+    var confirmImportBtn = document.getElementById('confirmImportBtn');
+    var cancelImportBtn = document.getElementById('cancelImportBtn');
+    var importJsonInput = document.getElementById('importJsonInput');
+    var importFormContainer = document.getElementById('importFormContainer');
     var exportBtn = document.getElementById('exportPayloadsBtn');
-    var fileInput = document.getElementById('importFileInput');
 
     if (closeBtn) {
       closeBtn.addEventListener('click', function() {
@@ -796,24 +819,38 @@ class CyberInject {
       }.bind(this));
     }
 
-    if (importBtn) {
-      importBtn.addEventListener('click', () => {
-        fileInput.click();
+    if (showImportBtn) {
+      showImportBtn.addEventListener('click', () => {
+        importFormContainer.style.display = importFormContainer.style.display === 'none' ? 'block' : 'none';
+        if (importFormContainer.style.display === 'block') {
+          importJsonInput.focus();
+        }
+      });
+    }
+
+    if (cancelImportBtn) {
+      cancelImportBtn.addEventListener('click', () => {
+        importFormContainer.style.display = 'none';
+        importJsonInput.value = '';
+      });
+    }
+
+    if (confirmImportBtn) {
+      confirmImportBtn.addEventListener('click', () => {
+        const jsonText = importJsonInput.value.trim();
+        if (jsonText) {
+          this.importCustomPayloadsFromText(jsonText);
+          importFormContainer.style.display = 'none';
+          importJsonInput.value = '';
+        } else {
+          this.showTemporaryMessage('Please paste JSON to import', 'error');
+        }
       });
     }
 
     if (exportBtn) {
       exportBtn.addEventListener('click', () => {
         this.exportCustomPayloads();
-      });
-    }
-
-    if (fileInput) {
-      fileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          this.importCustomPayloads(file);
-        }
       });
     }
 
@@ -841,47 +878,37 @@ class CyberInject {
     this.showTemporaryMessage(`Exported ${this.customPayloads.length} payloads`, 'success');
   }
 
-  async importCustomPayloads(file) {
-    const reader = new FileReader();
-    
-    reader.onload = async (e) => {
-      try {
-        const importedPayloads = JSON.parse(e.target.result);
-        
-        if (!Array.isArray(importedPayloads)) {
-          throw new Error('Invalid file format');
-        }
-
-        let importedCount = 0;
-        for (const payload of importedPayloads) {
-          if (payload.name && payload.category && payload.code && payload.description) {
-            payload.id = Date.now().toString() + Math.random();
-            payload.custom = true;
-            this.customPayloads.push(payload);
-            importedCount++;
-          }
-        }
-
-        if (importedCount > 0) {
-          await this.saveCustomPayloads();
-          this.renderCustomPayloadsOverlay();
-          this.renderCustomPayloads();
-          this.updatePayloadCounts();
-          this.showTemporaryMessage(`Imported ${importedCount} payloads`, 'success');
-        } else {
-          this.showTemporaryMessage('No valid payloads found in file', 'error');
-        }
-      } catch (error) {
-        console.error('Import error:', error);
-        this.showTemporaryMessage('Failed to import payloads', 'error');
+  async importCustomPayloadsFromText(jsonText) {
+    try {
+      const importedPayloads = JSON.parse(jsonText);
+      
+      if (!Array.isArray(importedPayloads)) {
+        throw new Error('Invalid JSON format. Expected an array of payloads.');
       }
-    };
 
-    reader.onerror = () => {
-      this.showTemporaryMessage('Failed to read file', 'error');
-    };
+      let importedCount = 0;
+      for (const payload of importedPayloads) {
+        if (payload.name && payload.category && payload.code && payload.description) {
+          payload.id = Date.now().toString() + Math.random();
+          payload.custom = true;
+          this.customPayloads.push(payload);
+          importedCount++;
+        }
+      }
 
-    reader.readAsText(file);
+      if (importedCount > 0) {
+        await this.saveCustomPayloads();
+        this.renderCustomPayloadsOverlay();
+        this.renderCustomPayloads();
+        this.updatePayloadCounts();
+        this.showTemporaryMessage(`Imported ${importedCount} payloads`, 'success');
+      } else {
+        this.showTemporaryMessage('No valid payloads found in JSON', 'error');
+      }
+    } catch (error) {
+      console.error('Import error:', error);
+      this.showTemporaryMessage('Failed to import: ' + error.message, 'error');
+    }
   }
 
   hideSettingsOverlay() {
