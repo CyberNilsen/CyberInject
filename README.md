@@ -19,6 +19,7 @@ A comprehensive browser extension designed for authorized security testing and p
 - Unauthorized use may violate laws and regulations
 - Users are solely responsible for compliance with applicable laws
 - Always obtain proper authorization before conducting security assessments
+- Windows Defender and other antivirus tools flag the extension as a threat due to its existing injections, and you have to mark it as safe for it to work properly
 
 ## 🚀 Features
 
